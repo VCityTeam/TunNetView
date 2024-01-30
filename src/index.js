@@ -36,7 +36,7 @@ loadMultipleJSON([
         parentDomElement: document.body,
         domElementClass: 'full_screen',
         defaultPointCloudSize: DEFAULT_POINT_SIZE,
-        maxSubdivisionLevel: 5,
+        maxSubdivisionLevel: 7,
         c3DTilesLoadingDomElementClasses: ['centered', 'loading'],
         camera: {
           default: {
