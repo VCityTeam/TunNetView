@@ -15,7 +15,4 @@ module.exports = {
       },
     ],
   },
-  resolve: {
-    modules: ['../UD-Viz/node_modules', './node_modules'],
-  },
 };
