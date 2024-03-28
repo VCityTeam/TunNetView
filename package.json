@@ -4,6 +4,8 @@
   "description": "A webGL based viewer of underground 3DTiles point cloud data.",
   "main": "index.js",
   "scripts": {
+    "clean": "rm -f -r node_modules dist && rm -f package-lock.json",
+    "start": "npx http-server -p 8000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,9 +26,10 @@
   },
   "homepage": "https://github.com/VCityTeam/TunNetView#readme",
   "dependencies": {
-    "@ud-viz/point_cloud_visualizer": "^4.0.3",
-    "@ud-viz/widget_bookmark": "^4.0.3",
-    "@ud-viz/widget_layer_choice": "^4.0.3",
+    "@ud-viz/point_cloud_visualizer": "^4.1.0",
+    "@ud-viz/widget_bookmark": "^4.1.0",
+    "@ud-viz/widget_layer_choice": "^4.1.0",
+    "@ud-viz/widget_3d_tiles": "^4.1.0",
     "buffer": "^6.0.3"
   },
   "devDependencies": {

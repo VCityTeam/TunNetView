@@ -1,8 +1,7 @@
 import { loadMultipleJSON } from '@ud-viz/utils_browser';
 import * as proj4 from 'proj4';
 import { PointCloudVisualizer } from '@ud-viz/point_cloud_visualizer';
-import { LayerChoice } from '@ud-viz/widget_layer_choice';
-import { Bookmark } from '@ud-viz/widget_bookmark';
+import { C3DTiles } from '@ud-viz/widget_3d_tiles';
 import * as itowns from 'itowns';
 /* { ColoLayer, Extent, WMSSource, ElevationLayer, STRATEGY_DICHOTOMY */
 
@@ -100,7 +99,7 @@ loadMultipleJSON([
       );
     });
 
-    // build ui
+    /////// Build the ui (widgets)
     const ui = document.createElement('div');
     ui.classList.add('ui');
     document.body.appendChild(ui);
@@ -115,37 +114,19 @@ loadMultipleJSON([
     // camera near far
     ui.appendChild(app.clippingPlaneDetails);
 
-    // widget layer choice
-    const layerParams = [];
-    app.itownsView.getLayers().forEach((layer) => {
-      if (
-        layer.id == 'planar' ||
-        layer.isElevationLayer ||
-        layer.isColorLayer
-      ) {
-        layerParams.push({ layer: layer });
-      }
-    });
-    app.pointCloudLayers.forEach((layer) => {
-      layerParams.push({
-        isPointCloud: true,
-        layer: layer,
-        defaultPointCloudSize: DEFAULT_POINT_SIZE,
-      });
-    });
-    const widgetLayerChoice = new LayerChoice(
-      app.itownsView,
-      layerParams
-    );
-    widgetLayerChoice.domElement.classList.add('widget_layer_choice');
+    // Widget allowing to provide an URL of a 3DTiles tileset
+    const uiDomElement = document.createElement('div');
+    uiDomElement.classList.add('full_screen');
+    ui.appendChild(uiDomElement);
 
-    ui.appendChild(widgetLayerChoice.domElement);
-
-    // widget bookmark
-    const widget = new Bookmark(app.itownsView, {
-      parentElement: ui,
+    const widget3dTilesThroughURL = new C3DTiles(app.itownsView, {
+      parentElement: uiDomElement,
+      // CSS customization is not needed in this context: commenting out
+      // layerContainerClassName: 'widgets-3dtiles-layer-container',
+      // c3DTFeatureInfoContainerClassName: 'widgets-3dtiles-feature-container',
+      // urlContainerClassName: 'widgets-3dtiles-url-container',
     });
-    widget.domElement.classList.add('widget_bookmark');
+    widget3dTilesThroughURL.domElement.setAttribute('id', 'widgets-3dtiles');
 
     // eslint-disable-next-line no-constant-condition
     if ('RUN_MODE' == 'production')
