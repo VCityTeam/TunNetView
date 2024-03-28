@@ -1,8 +1,14 @@
 [
   {
-    "name": "Villeurbanne_point_cloud",
+    "name": "Elaphes_cave_point_cloud",
     "source": {
       "url": "https://dataset-dl.liris.cnrs.fr/elaphes-cave/Exp-Cloud-ELAPHS-94M-sanitized-3DTiles/tileset-lyon_offset.json"
+    }
+  },
+  {
+    "name": "Lyon_fifth_borough",
+    "source": {
+      "url": "  https://dataset-dl.liris.cnrs.fr/three-d-tiles-lyon-metropolis/2015/Lyon-5_2015/tileset.json"
     }
   }
 ]

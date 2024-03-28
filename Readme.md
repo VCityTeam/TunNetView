@@ -17,7 +17,8 @@ https://tunnetview.vcityliris.cma.alpha.grandlyon.com/ (the illustrated
 https://github.com/VCityTeam/TunNetView.git   # This repository
 cd TunNetView
 npm install
+npm run build
+npm run start
 npx webpack --config webpack.config.js
-python3 -m  http.server &
 open http://localhost:8000
 ```
