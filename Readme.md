@@ -19,6 +19,5 @@ cd TunNetView
 npm install
 npm run build
 npm run start
-npx webpack --config webpack.config.js
 open http://localhost:8000
 ```

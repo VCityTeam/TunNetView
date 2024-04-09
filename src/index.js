@@ -2,8 +2,13 @@ import { loadMultipleJSON } from '@ud-viz/utils_browser';
 import * as proj4 from 'proj4';
 import { PointCloudVisualizer } from '@ud-viz/point_cloud_visualizer';
 import { C3DTiles } from '@ud-viz/widget_3d_tiles';
+import { initScene } from '@ud-viz/utils_browser';
 import * as itowns from 'itowns';
-/* { ColoLayer, Extent, WMSSource, ElevationLayer, STRATEGY_DICHOTOMY */
+
+// The PointCloudVisualizer widget stores the current camera position within
+// the local storage so that the rendering remains unchanged on scene reload.
+// Inhibit this feature for the time being.
+localStorage.clear();
 
 loadMultipleJSON([
   './assets/config/extents.json',
@@ -98,6 +103,17 @@ loadMultipleJSON([
         })
       );
     });
+
+    // Because the PointCloudVisualizer widget is dedicated to point cloud
+    // data visualisation it doesn't require the setting of an ambiant light
+    // (points dot not need to be lit by ambiant lights but are just colored
+    // vertices). initScene() is here used on the sole purpose of defining
+    // an ambient light.
+    initScene(
+      app.itownsView.camera.camera3D,
+      app.itownsView.mainLoop.gfxEngine.renderer,
+      app.itownsView.scene
+    )
 
     /////// Build the ui (widgets)
     const ui = document.createElement('div');
