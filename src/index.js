@@ -1,6 +1,7 @@
 import { loadMultipleJSON } from '@ud-viz/utils_browser';
 import * as proj4 from 'proj4';
 import { PointCloudVisualizer } from '@ud-viz/point_cloud_visualizer';
+import { LayerChoice } from '@ud-viz/widget_layer_choice';
 import { C3DTiles } from '@ud-viz/widget_3d_tiles';
 import { initScene } from '@ud-viz/utils_browser';
 import * as itowns from 'itowns';
@@ -14,6 +15,7 @@ loadMultipleJSON([
   './assets/config/extents.json',
   './assets/config/crs.json',
   './assets/config/layer/3DTiles_point_cloud.json',
+  './assets/config/layer/3DTiles.json',
   './assets/config/layer/elevation.json',
   './assets/config/layer/base_maps.json',
 ])
@@ -23,6 +25,16 @@ loadMultipleJSON([
       configs['crs'][0].transform
     );
 
+    /////////////////////////////////////////////////////////////////////////
+    // The application is build on top of the PointCloudVisualizer() class
+
+    // Default size at which any point of the point cloud shall be rendered.
+    // This should not be a constant but it should depend on the point cloud
+    // bounding box size and some "density" criteria of the points within that
+    // bounding box.
+    const DEFAULT_POINT_SIZE = 0.1;
+
+    // The geographical extent is set through the configuration files
     const extent = new itowns.Extent(
       configs['extents'][0].name,
       parseInt(configs['extents'][0].west),
@@ -31,11 +43,15 @@ loadMultipleJSON([
       parseInt(configs['extents'][0].north)
     );
 
-    const DEFAULT_POINT_SIZE = 0.1;
+    // The point cloud that the application proposes to explore is by default
+    // the one designated by the 3DTiles_point_cloud.json asset file:
+    const exploredPointCloud = configs['3DTiles_point_cloud'];
 
+    ///// Eventually, create the PointCloudVisualizer "application" with all
+    // the above parameters.
     const app = new PointCloudVisualizer(
       extent,
-      configs['3DTiles_point_cloud'],
+      exploredPointCloud,
       {
         parentDomElement: document.body,
         domElementClass: 'full_screen',
@@ -55,7 +71,9 @@ loadMultipleJSON([
       }
     );
 
-    // add elevation layer
+    ////////////////////////////////////////////////////////////////////// 
+    // Add the layers required by the scene
+    // Start with the elevation layer
     const isTextureFormat =
       configs['elevation']['format'] == 'image/jpeg' ||
       configs['elevation']['format'] == 'image/png';
@@ -82,7 +100,7 @@ loadMultipleJSON([
       )
     );
 
-    // add basemaps
+    // Add basemaps
     configs['base_maps'].forEach((baseMapConfig) => {
       app.itownsView.addLayer(
         new itowns.ColorLayer(baseMapConfig.name, {
@@ -104,23 +122,49 @@ loadMultipleJSON([
       );
     });
 
-    // Because the PointCloudVisualizer widget is dedicated to point cloud
-    // data visualisation it doesn't require the setting of an ambiant light
-    // (points dot not need to be lit by ambiant lights but are just colored
-    // vertices). initScene() is here used on the sole purpose of defining
-    // an ambient light.
+    // Add surfacic/triangulation 3D_tiles
+    // PointCloudVisualizer widget deals with 3DTiles that package point clouds.
+    // Addding 3DTiles that package triangulation/surfaces must be done 
+    // separatly because e.g. the PointCloudVisualizer widget  doesn't require 
+    // the setting of an ambiant light (points do not need to be lit by ambiant
+    // lights but are just colored vertices). 
+     configs['3DTiles'].forEach((layerConfig) => {
+      itowns.View.prototype.addLayer.call(
+        app.itownsView,
+        new itowns.C3DTilesLayer(
+          layerConfig['id'],
+          {
+            name: layerConfig['id'],
+            source: new itowns.C3DTilesSource({
+              url: layerConfig['url'],
+            }),
+          },
+          app.itownsView,
+        )
+      );
+    });
+    // FIXME FIXME
+    // 1. mettre le C3DTilesLayer dans une variable.C3DTiles
+    // 2. ajouter un listener sur l'evenement On_tile_content_loaded (regarder
+    //    dans itowns ou udvis)
+    // 3. une fois chargé, dans la callback aller chercher le layer.root
+    //    en faire le traverse sur les children du root, aller chercher le
+    //    materiel, en changer la composante side doubleside !!!!!!!!! 
+
+    // initScene() is here used on the sole purpose of defining an ambient light.
     initScene(
       app.itownsView.camera.camera3D,
       app.itownsView.mainLoop.gfxEngine.renderer,
       app.itownsView.scene
     )
 
-    /////// Build the ui (widgets)
+    /////////////////////////////////////////////////////////////////////////
+    // Build the ui (with the help of widgets)
     const ui = document.createElement('div');
     ui.classList.add('ui');
     document.body.appendChild(ui);
 
-    // speed controls
+    ///// Mouse speed controls
     ui.appendChild(app.domElementSpeedControls);
     // drag element
     app.domElementTargetDragElement.classList.add('drag_element');
@@ -130,19 +174,27 @@ loadMultipleJSON([
     // camera near far
     ui.appendChild(app.clippingPlaneDetails);
 
-    // Widget allowing to provide an URL of a 3DTiles tileset
+    //////// Widget allowing to provide an URL of a 3DTiles tileset
     const uiDomElement = document.createElement('div');
     uiDomElement.classList.add('full_screen');
     ui.appendChild(uiDomElement);
 
     const widget3dTilesThroughURL = new C3DTiles(app.itownsView, {
       parentElement: uiDomElement,
-      // CSS customization is not needed in this context: commenting out
-      // layerContainerClassName: 'widgets-3dtiles-layer-container',
-      // c3DTFeatureInfoContainerClassName: 'widgets-3dtiles-feature-container',
-      // urlContainerClassName: 'widgets-3dtiles-url-container',
+      // We wish to use @ud-viz/widget_layer_choice for listing the layers: 
+      displayExistingLayers: false,
     });
     widget3dTilesThroughURL.domElement.setAttribute('id', 'widgets-3dtiles');
+
+    ///////// Add a layer choice widget
+    const layerChoice = new LayerChoice(app.itownsView,);
+    layerChoice.domElement.classList.add('widget_layer_choice');
+
+    const uiLayerChoiceDomElement = document.createElement('div');
+    uiLayerChoiceDomElement.classList.add('full_screen');
+    uiDomElement.appendChild(uiLayerChoiceDomElement);
+
+    uiLayerChoiceDomElement.appendChild(layerChoice.domElement);
 
     // eslint-disable-next-line no-constant-condition
     if ('RUN_MODE' == 'production')
@@ -152,6 +204,8 @@ loadMultipleJSON([
       if (event.key == 'p') console.log(app);
     });
 
+    ///////////////////////////////////////////////////////////////////////
+    // When getting close to subterranean objects, hide other objects.
     // Because this PointCloudVisualizer based application is dedicated/specific
     // to visualizing 3DTileset of tunnels and caves the geometric structures
     // of interest will (most often) be subterrenean. This pauses the difficulty

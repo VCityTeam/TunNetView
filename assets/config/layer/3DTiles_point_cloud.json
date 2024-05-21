@@ -1,14 +1,8 @@
 [
   {
-    "name": "Elaphes_cave_point_cloud",
+    "name": "Synthetic_caves",
     "source": {
-      "url": "https://dataset-dl.liris.cnrs.fr/elaphes-cave/Exp-Cloud-ELAPHS-94M-sanitized-3DTiles/tileset-lyon_offset.json"
-    }
-  },
-  {
-    "name": "Lyon_fifth_borough",
-    "source": {
-      "url": "  https://dataset-dl.liris.cnrs.fr/three-d-tiles-lyon-metropolis/2015/Lyon-5_2015/tileset.json"
+      "url": "https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_4_grid_size_x_1_grid_size_y_1_point_cloud-3dtiles/tileset-translated-to-lyon-cathedral.json"
     }
   }
 ]
