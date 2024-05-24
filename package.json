@@ -27,11 +27,11 @@
   },
   "homepage": "https://github.com/VCityTeam/TunNetView#readme",
   "dependencies": {
-    "@ud-viz/point_cloud_visualizer": "^4.2.0",
-    "@ud-viz/utils_browser": "^4.2.0",
-    "@ud-viz/widget_3d_tiles": "^4.2.0",
-    "@ud-viz/widget_bookmark": "^4.2.0",
-    "@ud-viz/widget_layer_choice": "^4.2.0",
+    "@ud-viz/point_cloud_visualizer": "file:../UD-Viz/packages/point_cloud_visualizer",
+    "@ud-viz/utils_browser": "file:../UD-Viz/packages/utils_browser",
+    "@ud-viz/widget_3d_tiles": "file:../UD-Viz/packages/widget_3d_tiles",
+    "@ud-viz/widget_bookmark": "file:../UD-Viz/packages/widget_bookmark",
+    "@ud-viz/widget_layer_choice": "file:../UD-Viz/packages/widget_layer_choice",
     "buffer": "^6.0.3"
   },
   "devDependencies": {
