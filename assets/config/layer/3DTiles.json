@@ -1,6 +1,8 @@
 [
   {
     "id": "TunnelInCroixRousse",
-    "url": "https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Tunnel/tunnel_sub_3_triangulation-3dtiles/tileset-translated-to-lyon-redhaired_cross.json"
+    "source": {
+      "url": "https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Tunnel/tunnel_sub_3_triangulation-3dtiles/tileset-translated-to-lyon-redhaired_cross.json"
+    }
   }
 ]
