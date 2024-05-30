@@ -6,6 +6,8 @@ import { C3DTiles } from '@ud-viz/widget_3d_tiles';
 import { initScene } from '@ud-viz/utils_browser';
 import * as itowns from 'itowns';
 
+import { Visualizer } from './Visualizer';
+
 // The PointCloudVisualizer widget stores the current camera position within
 // the local storage so that the rendering remains unchanged on scene reload.
 // Inhibit this feature for the time being.
@@ -41,11 +43,11 @@ loadMultipleJSON([
 
   // The point cloud that the application proposes to explore is by default
   // the one designated by the 3DTiles_point_cloud.json asset file:
-  const exploredPointCloud = configs['3DTiles_point_cloud'];
+  const layersConfigs = configs['3DTiles_point_cloud'];
 
   ///// Eventually, create the PointCloudVisualizer "application" with all
   // the above parameters.
-  const app = new PointCloudVisualizer(extent, exploredPointCloud, {
+  const app = new Visualizer(extent, layersConfigs, {
     parentDomElement: document.body,
     domElementClass: 'full_screen',
     defaultPointCloudSize: DEFAULT_POINT_SIZE,
@@ -117,21 +119,21 @@ loadMultipleJSON([
   // separatly because e.g. the PointCloudVisualizer widget  doesn't require
   // the setting of an ambiant light (points do not need to be lit by ambiant
   // lights but are just colored vertices).
-  configs['3DTiles'].forEach((layerConfig) => {
-    itowns.View.prototype.addLayer.call(
-      app.itownsView,
-      new itowns.C3DTilesLayer(
-        layerConfig['id'],
-        {
-          name: layerConfig['id'],
-          source: new itowns.C3DTilesSource({
-            url: layerConfig['url'],
-          }),
-        },
-        app.itownsView
-      )
-    );
-  });
+  // const c3dTilesLayers = [];
+  // configs['3DTiles'].forEach((layerConfig) => {
+  //   const layer = new itowns.C3DTilesLayer(
+  //     layerConfig['id'],
+  //     {
+  //       name: layerConfig['id'],
+  //       source: new itowns.C3DTilesSource({
+  //         url: layerConfig['url'],
+  //       }),
+  //     },
+  //     app.itownsView
+  //   );
+  //   itowns.View.prototype.addLayer.call(app.itownsView, layer);
+  //   c3dTilesLayers.push(layer);
+  // });
   // FIXME FIXME
   // 1. mettre le C3DTilesLayer dans une variable.C3DTiles
   // 2. ajouter un listener sur l'evenement On_tile_content_loaded (regarder
@@ -182,10 +184,26 @@ loadMultipleJSON([
   const uiLayerChoiceDomElement = document.createElement('div');
   uiLayerChoiceDomElement.classList.add('full_screen');
   uiDomElement.appendChild(uiLayerChoiceDomElement);
+  const promisesContentLoaded = [];
+  app.layers.forEach((layer) => {
+    promisesContentLoaded.push(
+      new Promise((resolve) => {
+        layer.addEventListener(
+          itowns.C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED,
+          () => {
+            resolve();
+          }
+        );
+      })
+    );
+  });
 
   layerChoice.addEventListener(LayerChoice.EVENT.FOCUS_3D_TILES, (data) => {
-    debugger;
-    app.moveCamera(null, data.message.targetPos, 0);
+    // const target = data.message.targetPos;
+    const target = data.message.layerFocused.root.position.clone();
+    console.log(target);
+    // app.targetOrbitControlsMesh.position.copy(target);
+    app.orbitControls.target.copy(target);
   });
 
   uiLayerChoiceDomElement.appendChild(layerChoice.domElement);
@@ -218,15 +236,15 @@ loadMultipleJSON([
   function isCameraInsideZoneOfInterest(app) {
     // Consider the first point cloud managed by the PointCloudVisualizer
     // and compute the center of its bounding box.
-    if (typeof app.pointCloudLayers[0] === 'undefined') {
+    if (typeof app.layers[0] === 'undefined') {
       console.log('Unfound point cloud.');
       return false;
     }
-    if (typeof app.pointCloudLayers[0].root === 'undefined') {
+    if (typeof app.layers[0].root === 'undefined') {
       console.log('Unfound rootTile.');
       return false;
     }
-    const rootTile = app.pointCloudLayers[0].root;
+    const rootTile = app.layers[0].root;
     const rootTilePosition = rootTile.position;
     const rootTileBox = rootTile.boundingVolume.box;
     var boxMin = rootTileBox.min.clone();

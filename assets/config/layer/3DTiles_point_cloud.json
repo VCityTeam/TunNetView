@@ -4,5 +4,11 @@
     "source": {
       "url": "https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_4_grid_size_x_1_grid_size_y_1_point_cloud-3dtiles/tileset-translated-to-lyon-cathedral.json"
     }
+  },
+  {
+    "name": "TunnelInCroixRousse",
+    "source": {
+      "url": "https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Tunnel/tunnel_sub_3_triangulation-3dtiles/tileset-translated-to-lyon-redhaired_cross.json"
+    }
   }
 ]
