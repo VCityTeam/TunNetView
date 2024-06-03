@@ -13,7 +13,7 @@ https://tunnetview.vcityliris.cma.alpha.grandlyon.com/ (the illustrated
 ## For the impatient
 
 ```bash
-https://github.com/VCityTeam/TunNetView.git   # This repository
+git clone https://github.com/VCityTeam/TunNetView.git   # This repository
 cd TunNetView
 ```
 
