@@ -5,6 +5,7 @@ import { LayerChoice } from '@ud-viz/widget_layer_choice';
 import { C3DTiles } from '@ud-viz/widget_3d_tiles';
 import { initScene } from '@ud-viz/utils_browser';
 import * as itowns from 'itowns';
+import * as THREE from 'three';
 
 import { Visualizer } from './Visualizer';
 
@@ -199,10 +200,11 @@ loadMultipleJSON([
   });
 
   layerChoice.addEventListener(LayerChoice.EVENT.FOCUS_3D_TILES, (data) => {
-    // const target = data.message.targetPos;
-    const target = data.message.layerFocused.root.position.clone();
-    console.log(target);
-    // app.targetOrbitControlsMesh.position.copy(target);
+    const bb = data.message.layerFocused.root.boundingVolume.box;
+    const center = bb.getCenter(new THREE.Vector3());
+    const target = data.message.layerFocused.root.position
+      .clone()
+      .add(center.clone());
     app.orbitControls.target.copy(target);
   });
 
