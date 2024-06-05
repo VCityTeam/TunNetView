@@ -152,6 +152,11 @@ export class Visualizer {
             tileContent.traverse((child) => {
               if (child.material) child.material = pointCloudMaterial;
             });
+          } else {
+            // itowns is cloning the material breaking the reference on this.clippingPlane
+            tileContent.traverse((child) => {
+              if (child.material) child.material.side = DoubleSide;
+            });
           }
         }
       );
