@@ -145,7 +145,6 @@ export class Visualizer {
             console.log(m.type);
             if (m.type == 'Points') {
               typePoint = true;
-              console.log("c'est un type points");
             }
           });
           if (typePoint) {
