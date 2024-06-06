@@ -223,10 +223,10 @@ export class Visualizer {
         )
       ) {
         const listener = (layer) => {
-          return;
-          // const bb = new Box3().setFromObject(layer.tileContent);
-          // bb.getCenter(this.orbitControls.target);
-          this.orbitControls.target = layer.tileContent.position;
+          const bb = layer.tileContent.boundingVolume.box;
+          const center = bb.getCenter(new Vector3());
+          const target = layer.tileContent.position.clone().add(center.clone());
+          this.orbitControls.target.copy(target);
           this.orbitControls.update();
           this.itownsView.notifyChange(this.itownsView.camera.camera3D);
           this.layers.forEach((layer) =>
