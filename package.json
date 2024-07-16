@@ -7,8 +7,8 @@
     "clean": "rm -f -r node_modules dist && rm -f package-lock.json",
     "build": "webpack --config webpack.config.js",
     "watch-build": "nodemon --watch src -e js --exec 'npm run build' ",
-    "start": "npx http-server -p 8000",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/backEnd.js",
+    "start-test": "cross-env PORT=8099 SYNTHETIC_CAVE_URL='https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_1_grid_size_x_1_grid_size_y_1_point_cloud-3dtiles/tileset-translated-to-lyon-cathedral.json' node ./bin/backEnd.js"
   },
   "repository": {
     "type": "git",
