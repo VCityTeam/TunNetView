@@ -1,5 +1,15 @@
-An [UD-Viz based](https://github.com/VCityTeam/UD-Viz) web-application that displays
-underground cave/tunnel-systems.
+# A web-application for underground cave/tunnel-systems<!-- omit from toc -->
+
+## Table of content<!-- omit from toc -->
+
+- [Introduction](#introduction)
+- [For the impatient](#for-the-impatient)
+- [Runtime environment variables](#runtime-environment-variables)
+- [Running with docker](#running-with-docker)
+
+## Introduction
+
+TunNetView is a very simple, [UD-Viz based](https://github.com/VCityTeam/UD-Viz), web-application allowing the visual exploration of underground cave/tunnel-systems.
 
 A dockerized version is available at
 [TunNetView-docker](https://github.com/VCityTeam/TunNetView-docker)
