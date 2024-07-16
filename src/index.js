@@ -8,6 +8,7 @@ import * as itowns from 'itowns';
 import * as THREE from 'three';
 
 import { Visualizer } from './Visualizer';
+import { Cam } from './CameraController';
 
 // The PointCloudVisualizer widget stores the current camera position within
 // the local storage so that the rendering remains unchanged on scene reload.
@@ -185,6 +186,7 @@ loadMultipleJSON([
   const uiLayerChoiceDomElement = document.createElement('div');
   uiLayerChoiceDomElement.classList.add('full_screen');
   uiDomElement.appendChild(uiLayerChoiceDomElement);
+
   const promisesContentLoaded = [];
   app.layers.forEach((layer) => {
     promisesContentLoaded.push(
@@ -202,7 +204,7 @@ loadMultipleJSON([
   layerChoice.addEventListener(LayerChoice.EVENT.FOCUS_3D_TILES, (data) => {
     const bb = data.message.layerFocused.root.boundingVolume.box;
     const center = bb.getCenter(new THREE.Vector3());
-    const target = data.message.layerFocused.root.position
+    const target = data.message.layerFocused.root.position // position du target mesh (sphere rouge)
       .clone()
       .add(center.clone());
     app.orbitControls.target.copy(target);
@@ -302,6 +304,8 @@ loadMultipleJSON([
     // There was no contradiction between where we thought we were (be it
     // outside of inside) and were we are. We thus didn't cross the ZOI
     // border and hence the opacity remains unchanged.
+
+
 
     if (event.key == 'p') console.log(app);
   });
