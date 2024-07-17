@@ -30,14 +30,6 @@ class Point {
         this.linkedPoint.push(parseInt(int));
     }
 
-    toJSON() {
-        return {
-            x: this.x,
-            y: this.y,
-            z: this.z,
-            linkedPoint: this.linkedPoint
-        }
-    }
 }
 
 function buildPoint(filePath) {
@@ -82,7 +74,7 @@ function buildPoint(filePath) {
 }
 
 function findStart(mapPoint) {
-    for (const [key, point] of mapPoint) {
+    for (const point of mapPoint) {
         if (point.getLinkedPoint().length === 1) {
             //console.log(`Start: ${key} Point(${point.getX()}, ${point.getY()}, ${point.getZ()})`);
             return point;
@@ -96,14 +88,23 @@ function findStart(mapPoint) {
         const filePath = '../axe_median/skel.sdp.scaled.obj';
         const mapPoint = await buildPoint(filePath);
         const startPoint = findStart(mapPoint);
-        // Convert to .json
-        fs.writeFileSync(path.resolve(__dirname, '../assets/config/point.json'), JSON.stringify([...mapPoint]), 'utf-8');
 
-        //console.log(mapPoint); // Affichez la carte des points
-        //console.log(startPoint); // Affichez le point de départ
+        // Create an object containing both mapPoint and startPoint
+        const dataToWrite = {
+            mapPoint: [...mapPoint],
+            startPoint: startPoint
+        };
+
+        // Convert to .json and write to the file
+        fs.writeFileSync(path.resolve(__dirname, '../assets/config/point.json'), JSON.stringify(dataToWrite), 'utf-8');
+
+        //console.log(mapPoint); // Display the map points
+        //console.log(startPoint); // Display the start point
     } catch (err) {
         console.error(err);
     }
 })();
+
+
 
 

@@ -55,32 +55,40 @@ export class Cam {
         }
     }
 
-    addListener() {
-        window.addEventListener(
+    move() {
+        this._camera.position.add(new Vector3(0, 5, 0));
+    }
 
+    addListener() {
+        console.log("addlist");
+        window.addEventListener(
             "keydown",
-            function (event) {
+            (event) => {
                 if (event.defaultPrevented) {
                     return; // Ne devrait rien faire si l'événement de la touche était déjà consommé.
                 }
-
-                switch (event.key) {
+                console.log("Event");
+                switch (event.code) {
                     case "Space":
-                        console.log("Coucou");
-                        cam.move();
+                        console.log("Space");
+                        this.move();
                         break;
                     case "ArrowUp":
+                        console.log("ArrowUp");
                         // Déplacement de currentPoint to focusPoint
-                        cam.currentPoint = cam.focusPoint();
-                        cam.setFocus();
+                        this.currentPoint = this.focusPoint();
+                        this.setFocus();
                         break;
                     case "ArrowLeft":
+                        console.log("ArrowLeft");
                         // Faire quelque chose pour la touche "left arrow" pressée.
                         break;
                     case "ArrowRight":
+                        console.log("ArrowRight");
                         // Faire quelque chose pour la touche "right arrow" pressée.
                         break;
                     default:
+                        console.log("Reste");
                         return; // Quitter lorsque cela ne gère pas l'événement touche.
                 }
 
@@ -91,10 +99,6 @@ export class Cam {
         );
     }
 
-    move() {
-        this._camera.position.add(new Vector3(0, 5, 0));
-
-    }
 }
 
 
