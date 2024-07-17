@@ -9,6 +9,7 @@ import * as THREE from 'three';
 
 import { Visualizer } from './Visualizer';
 import { Cam } from './CameraController';
+import { Point } from './Point';
 
 // The PointCloudVisualizer widget stores the current camera position within
 // the local storage so that the rendering remains unchanged on scene reload.
@@ -305,8 +306,13 @@ loadMultipleJSON([
     // outside of inside) and were we are. We thus didn't cross the ZOI
     // border and hence the opacity remains unchanged.
 
-
-
-    if (event.key == 'p') console.log(app);
   });
+  // (async () => {
+  //   const mapPoint = await buildPoint('../config/point.json');
+  //   const startPoint = findStart(mapPoint);
+  const startPoint = new Point(0, 0, 0);
+  const camera = new Cam(startPoint, app.itownsView.camera.camera3D);
+  // })();
+
+  if (event.key == 'p') console.log(app);
 });
