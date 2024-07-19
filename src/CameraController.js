@@ -1,16 +1,18 @@
 import { Camera, Vector3 } from 'three';
+import { Point } from './Point';
 // Utiliser les fonctions importées
 
 export class Cam {
     /**
-     * @param {Vector3} startPoint
+     * @param {Point} startPoint
      * @param {Camera} camera3D
      * 
     */
-    constructor(startPoint, camera3D) {
-        this._currentPoint = startPoint; // Convention pour indiquer une propriété privée
-        this._focusPoint = null; // Convention pour indiquer une propriété privée
-        this._camera = camera3D; // Convention pour indiquer une propriété privée
+    constructor(startPoint, mapPoint, camera3D) {
+        this._currentPoint = startPoint;
+        this._focusPoint = null;
+        this._mapPoint = mapPoint;
+        this._camera = camera3D;
 
 
         this.setFocus();
@@ -37,6 +39,16 @@ export class Cam {
         this._focusPoint = point;
     }
 
+    // Getter pour mapPoint
+    get mapPoint() {
+        return this._mapPoint;
+    }
+
+    // Setter pour focusPoint
+    set mapPoint(map) {
+        this.mapPoint = map;
+    }
+
     // Getter pour camera
     get camera() {
         return this._camera;
@@ -56,39 +68,39 @@ export class Cam {
     }
 
     move() {
-        this._camera.position.add(new Vector3(0, 5, 0));
+        this._camera.position.add(new Vector3(20, 20, 20));
     }
 
     addListener() {
-        console.log("addlist");
+        // console.log("addlist");
         window.addEventListener(
             "keydown",
             (event) => {
                 if (event.defaultPrevented) {
                     return; // Ne devrait rien faire si l'événement de la touche était déjà consommé.
                 }
-                console.log("Event");
+                // console.log("Event");
                 switch (event.code) {
                     case "Space":
-                        console.log("Space");
+                        // console.log("Space");
                         this.move();
                         break;
                     case "ArrowUp":
-                        console.log("ArrowUp");
+                        // console.log("ArrowUp");
                         // Déplacement de currentPoint to focusPoint
-                        this.currentPoint = this.focusPoint();
+                        this.currentPoint = this.mapPoint.get(this.focusPoint);
                         this.setFocus();
                         break;
                     case "ArrowLeft":
-                        console.log("ArrowLeft");
+                        // console.log("ArrowLeft");
                         // Faire quelque chose pour la touche "left arrow" pressée.
                         break;
                     case "ArrowRight":
-                        console.log("ArrowRight");
+                        // console.log("ArrowRight");
                         // Faire quelque chose pour la touche "right arrow" pressée.
                         break;
                     default:
-                        console.log("Reste");
+                        // console.log("Reste");
                         return; // Quitter lorsque cela ne gère pas l'événement touche.
                 }
 
