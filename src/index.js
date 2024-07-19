@@ -9,7 +9,7 @@ import * as THREE from 'three';
 
 import { Visualizer } from './Visualizer';
 import { Cam } from './CameraController';
-import { Point } from './Point';
+import { buildPoint, findStart, Point } from './Point';
 
 // The PointCloudVisualizer widget stores the current camera position within
 // the local storage so that the rendering remains unchanged on scene reload.
@@ -23,6 +23,7 @@ loadMultipleJSON([
   './assets/config/layer/3DTiles.json',
   './assets/config/layer/elevation.json',
   './assets/config/layer/base_maps.json',
+  './assets/config/point.json',
 ]).then((configs) => {
   proj4.default.defs(configs['crs'][0].name, configs['crs'][0].transform);
 
@@ -307,12 +308,12 @@ loadMultipleJSON([
     // border and hence the opacity remains unchanged.
 
   });
-  // (async () => {
-  //   const mapPoint = await buildPoint('../config/point.json');
-  //   const startPoint = findStart(mapPoint);
-  const startPoint = new Point(0, 0, 0);
-  const camera = new Cam(startPoint, app.itownsView.camera.camera3D);
-  // })();
+  (async () => {
+    const mapPoint = await buildPoint(configs['point']);
+    const startPoint = findStart(mapPoint);
+    // const startPoint = new Point(0, 0, 0);
+    const camera = new Cam(startPoint, mapPoint, app.itownsView.camera.camera3D);
+  })();
 
   if (event.key == 'p') console.log(app);
 });

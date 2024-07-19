@@ -27,35 +27,30 @@ export class Point {
     }
 }
 
-async function buildPoint(filePath) {
-    try {
-        const response = await fetch(filePath);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const jsonData = await response.json();
+export async function buildPoint(jsonData) {
 
-        const mapPoint = new Map();
-        jsonData.mapPoint.forEach(([key, pointData]) => {
-            const point = new Point(pointData.x, pointData.y, pointData.z);
-            pointData.linkedPoint.forEach(lp => point.addLinkedPoint(lp));
-            mapPoint.set(key, point);
-        });
+    const mapPoint = new Map();
+    jsonData.points.forEach((pointData) => {
+        const id = pointData[0];
+        const p = pointData[1];
+        const point = new Point(Number(p.x), Number(p.y), Number(p.z));
+        p.linkedPoint.forEach(lp => point.addLinkedPoint(lp));
+        mapPoint.set(id, point);
+    });
 
-        return mapPoint;
-    } catch (err) {
-        console.error('Error reading or parsing the file:', err);
-        throw err;
-    }
+    return mapPoint;
+
 }
 
-function findStart(mapPoint) {
-    for (const point of mapPoint) {
+
+export function findStart(mapPoint) {
+    for (const point of mapPoint.values()) {
         if (point.getLinkedPoint().length === 1) {
             return point;
         }
     }
 }
+
 
 // Usage example:
 /*(async () => {

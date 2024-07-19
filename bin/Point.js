@@ -73,26 +73,16 @@ function buildPoint(filePath) {
     });
 }
 
-function findStart(mapPoint) {
-    for (const point of mapPoint) {
-        if (point.getLinkedPoint().length === 1) {
-            //console.log(`Start: ${key} Point(${point.getX()}, ${point.getY()}, ${point.getZ()})`);
-            return point;
-        }
-    }
-}
 
 
 (async () => {
     try {
-        const filePath = '../axe_median/skel.sdp.scaled.obj';
+        const filePath = '../demo/axe_median/skel.sdp.scaled.obj';
         const mapPoint = await buildPoint(filePath);
-        const startPoint = findStart(mapPoint);
 
         // Create an object containing both mapPoint and startPoint
         const dataToWrite = {
-            mapPoint: [...mapPoint],
-            startPoint: startPoint
+            mapPoint: [...mapPoint]
         };
 
         // Convert to .json and write to the file
