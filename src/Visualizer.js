@@ -170,6 +170,9 @@ export class Visualizer {
       this.itownsView.camera.camera3D,
       this.itownsView.mainLoop.gfxEngine.label2dRenderer.domElement
     );
+
+    this.orbitControls.target.copy(extent.center().toVector3().clone());
+
     // target orbit controls is a mesh
     /** @type {Mesh} */
     this.targetOrbitControlsMesh = new Mesh(
@@ -367,23 +370,28 @@ export class Visualizer {
 
     // box3 of point cloud
     {
-      const box3PointCloud = new Box3();
-      const boxMeshPointCloud = new Mesh(
+      const globalBB = new Box3();
+      const globalBBMesh = new Mesh(
         new BoxGeometry(),
         new MeshBasicMaterial({ wireframe: true })
       );
-      this.itownsView.scene.add(boxMeshPointCloud);
+      this.itownsView.scene.add(globalBBMesh);
       this.layers.forEach((c3dTilesLayer) => {
         c3dTilesLayer.addEventListener(
           C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED,
-          () => {
-            // box3PointCloud.setFromObject(c3dTilesLayer.object3d);
-            box3PointCloud.expandByObject(c3dTilesLayer.object3d);
-            box3PointCloud.getCenter(boxMeshPointCloud.position);
-            boxMeshPointCloud.scale.copy(
-              box3PointCloud.max.clone().sub(box3PointCloud.min)
+          (layer) => {
+            const newBB = layer.tileContent.boundingVolume.box.clone();
+            const target = layer.tileContent
+              .getWorldPosition(new Vector3())
+              .clone();
+            newBB.translate(target);
+            globalBB.union(newBB);
+
+            globalBBMesh.position.copy(globalBB.getCenter(new Vector3()));
+            globalBBMesh.scale.copy(
+              globalBB.max.clone().sub(globalBB.min.clone())
             );
-            boxMeshPointCloud.updateMatrixWorld();
+            globalBBMesh.updateMatrixWorld();
           }
         );
       });
