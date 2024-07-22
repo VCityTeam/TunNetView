@@ -15,6 +15,15 @@ import {
   DoubleSide,
 } from 'three';
 
+/**
+ * @typedef {Object} ClippingPlaneUI
+ * @property {HTMLDetailsElement} details
+ * @property {HTMLInputElement} planeVisible
+ * @property {HTMLInputElement} clippingPlane
+ * @property {HTMLButtonElement} translateButton
+ * @property {HTMLButtonElement} rotateButton
+ * @property {HTMLButtonElement} scaleButton
+ */
 export class ClippingPlane {
   constructor(itownsView) {
     this.plane = new Plane();
@@ -22,6 +31,7 @@ export class ClippingPlane {
     /**@type {PlanarView} */
     this.itownsView = itownsView;
 
+    /** @type {ClippingPlaneUI} */
     this.UI = {};
 
     /**@type {TransformControls} */
@@ -43,18 +53,28 @@ export class ClippingPlane {
       null
     );
 
-    this.UI.details.planeVisible = createLocalStorageCheckbox(
+    this.UI.planeVisible = createLocalStorageCheckbox(
       'plane_visibility_key_loacal_storage',
       'Visible: ',
       this.UI.details,
       true
     );
 
-    this.UI.details.clippingEnable = createLocalStorageCheckbox(
+    this.UI.clippingEnable = createLocalStorageCheckbox(
       'plane_enable_key_loacal_storage',
       'Enable: ',
       this.UI.details
     );
+
+    const mode = ['translate', 'rotate', 'scale'];
+
+    mode.forEach((m) => {
+      const buttonMode = document.createElement('button');
+      buttonMode.innerText = m;
+      buttonMode.mode = m;
+      this.UI[m + 'Button'] = buttonMode;
+      this.UI.details.appendChild(buttonMode);
+    });
   }
 
   initQuad() {
@@ -95,23 +115,10 @@ export class ClippingPlane {
     this.update();
 
     this.itownsView.scene.add(this.transformControls);
-
-    const addButtonMode = (mode) => {
-      const buttonMode = document.createElement('button');
-      buttonMode.innerText = mode;
-      this.UI.details.appendChild(buttonMode);
-
-      buttonMode.onclick = () => {
-        this.transformControls.setMode(mode);
-      };
-    };
-    addButtonMode('translate');
-    addButtonMode('rotate');
-    addButtonMode('scale');
   }
 
   initCallback() {
-    this.UI.details.planeVisible.addEventListener('change', (event) => {
+    this.UI.planeVisible.addEventListener('change', (event) => {
       this.quad.visible = event.target.checked;
       if (this.quad.visible) {
         this.transformControls.attach(this.quad);
@@ -122,10 +129,21 @@ export class ClippingPlane {
       this.itownsView.notifyChange();
     });
 
-    this.UI.details.clippingEnable.addEventListener('change', (event) => {
+    this.UI.clippingEnable.addEventListener('change', (event) => {
       this.itownsView.mainLoop.gfxEngine.renderer.localClippingEnabled =
         event.target.checked;
       this.itownsView.notifyChange();
+    });
+
+    [
+      this.UI.translateButton,
+      this.UI.rotateButton,
+      this.UI.scaleButton,
+    ].forEach((button) => {
+      button.addEventListener('click', () => {
+        this.transformControls.setMode(button.mode);
+        this.UI.planeVisible.dispatchEvent(new Event('change'));
+      });
     });
   }
 }
