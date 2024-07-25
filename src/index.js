@@ -1,4 +1,4 @@
-import { loadMultipleJSON } from '@ud-viz/utils_browser';
+import { colorSpace, loadMultipleJSON } from '@ud-viz/utils_browser';
 import * as proj4 from 'proj4';
 import { PointCloudVisualizer } from '@ud-viz/point_cloud_visualizer';
 import { LayerChoice } from '@ud-viz/widget_layer_choice';
@@ -7,6 +7,7 @@ import { initScene } from '@ud-viz/utils_browser';
 import * as itowns from 'itowns';
 import * as THREE from 'three';
 
+import { loadCavePath } from './LoadCavePath';
 import { Visualizer } from './Visualizer';
 import { Cam } from './CameraController';
 import { buildPoint, findStart, Point } from './Point';
@@ -189,19 +190,39 @@ loadMultipleJSON([
   uiLayerChoiceDomElement.classList.add('full_screen');
   uiDomElement.appendChild(uiLayerChoiceDomElement);
 
-  const promisesContentLoaded = [];
-  app.layers.forEach((layer) => {
-    promisesContentLoaded.push(
-      new Promise((resolve) => {
-        layer.addEventListener(
-          itowns.C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED,
-          () => {
-            resolve();
-          }
-        );
+  const syntheticCavesLoaded = () => {
+    return new Promise((resolve) => {
+
+      app.layers.forEach((layer) => {
+
+        if (layer.name === "Synthetic_caves") {
+          layer.addEventListener(itowns.C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED, (
+            layerLoaded
+          ) => {
+            // console.log(layerLoaded);
+            const offset = layerLoaded.tileContent.position.clone();
+            resolve(offset);
+          })
+        }
       })
-    );
-  });
+
+    });
+  }
+
+
+  const loaderCavePath = async () => {
+    const offset = await syntheticCavesLoaded();
+    // console.log(offset);
+    const object = await loadCavePath(app.itownsView.scene);
+    // console.log(object);
+    // const offset = new THREE.Vector3(1841729.466334, 5175204.02523159, 260.177757835388);
+    if (!offset.equals(new THREE.Vector3(0, 0, 0))) {
+      object.position.add(offset);
+      // FIX ME PLEASE
+      object.position.sub(new THREE.Vector3(1.5, 1.5, 0));
+    }
+  }
+  loaderCavePath()
 
   layerChoice.addEventListener(LayerChoice.EVENT.FOCUS_3D_TILES, (data) => {
     const bb = data.message.layerFocused.root.boundingVolume.box;
@@ -308,11 +329,16 @@ loadMultipleJSON([
     // border and hence the opacity remains unchanged.
 
   });
+
+
+  app.orbitControls.enabled = false;
+
   (async () => {
     const mapPoint = await buildPoint(configs['point']);
     const startPoint = findStart(mapPoint);
     // const startPoint = new Point(0, 0, 0);
-    const camera = new Cam(startPoint, mapPoint, app.itownsView.camera.camera3D);
+    const offset = await syntheticCavesLoaded();
+    const camera = new Cam(startPoint, mapPoint, app.itownsView.camera.camera3D, offset);
   })();
 
   if (event.key == 'p') console.log(app);

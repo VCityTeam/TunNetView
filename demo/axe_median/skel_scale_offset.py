@@ -28,4 +28,4 @@ with open(args.filepath, 'r') as infile:
             z = float(z) / args.scale - args.offset_z
             outfile.write(f'v {x} {y} {z}\n')
         
-        addLine(args.filepath, outfile, args.scale, args.offset_x, args.offset_y, args.offset_z)
+        addLine(args.filepath, outfile)
