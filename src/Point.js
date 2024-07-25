@@ -30,7 +30,7 @@ export class Point {
 export async function buildPoint(jsonData) {
 
     const mapPoint = new Map();
-    jsonData.points.forEach((pointData) => {
+    jsonData.mapPoint.forEach((pointData) => {
         const id = pointData[0];
         const p = pointData[1];
         const point = new Point(Number(p.x), Number(p.y), Number(p.z));
