@@ -11,6 +11,7 @@ export class Cam {
     constructor(startPoint, mapPoint, camera3D, offset) {
         this._currentPoint = startPoint;
         this._focusPoint = null;
+        this._oldPoint = null;
         this._mapPoint = mapPoint;
         this._camera = camera3D;
         this._offset = offset;
@@ -45,6 +46,16 @@ export class Cam {
     // Setter pour focusPoint
     set focusPoint(point) {
         this._focusPoint = point;
+    }
+
+    // Getter pour oldPoint
+    get oldPoint() {
+        return this._oldPoint;
+    }
+
+    // Setter pour oldPoint
+    set oldPoint(point) {
+        this._oldPoint = point;
     }
 
     // Getter pour mapPoint
@@ -102,74 +113,67 @@ export class Cam {
     }
 
     addListener() {
-        // console.log("addlist");
+        // Fonction fléchée pour déplacer la caméra
+        const moveCamera = (startPoint, endPoint, element, offset, duration = 2000) => {
+            const start = performance.now();
+            const startVector = new Vector3(startPoint.getX(), startPoint.getY(), startPoint.getZ());
+            const endVector = new Vector3(endPoint.getX(), endPoint.getY(), endPoint.getZ());
+
+            const updateCounter = (timestamp) => {
+                const elapsed = timestamp - start;
+                const alpha = Math.min(elapsed / duration, 1);
+                moveStep(startVector, endVector, alpha, offset);
+                if (alpha < 1) {
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    console.log(element.position);
+                }
+            };
+
+            const moveStep = (startVector, endVector, alpha, offset) => {
+                const nextVector = startVector.clone().lerp(endVector, alpha);
+                nextVector.add(offset);
+                element.position.copy(nextVector);
+            };
+
+            requestAnimationFrame(updateCounter);
+        };
+
+        // Ajout de l'écouteur d'événements pour les touches
         window.addEventListener(
             "keydown",
             (event) => {
                 if (event.defaultPrevented) {
                     return; // Ne devrait rien faire si l'événement de la touche était déjà consommé.
                 }
-                console.log(event.code);
+
                 const linkedPoint = this.currentPoint.getLinkedPoint();
                 switch (event.code) {
                     case "Space":
-                        // console.log("Space");
                         this.move();
                         break;
+
                     case "ArrowUp":
                         console.log("ArrowUp");
-
-                        const element = this.camera;
-
-                        console.log(element.position);
-                        // Déplacement de currentPoint to focusPoint
-                        const duration = 2000; // Durée de 2 secondes (2000 ms)
-                        const start = performance.now();
-                        const currentPoint = this.currentPoint;
-                        const focusPoint = this.focusPoint;
-                        const startVector = new Vector3(currentPoint.getX(), currentPoint.getY(), currentPoint.getZ());
-                        const endVector = new Vector3(focusPoint.getX(), focusPoint.getY(), focusPoint.getZ());
-                        const offset = this.offset;
-                        this.lookPoint(focusPoint);
-                        console.log("StartVector :", startVector);
-                        console.log("endVector :", endVector);
-
-                        const updateCounter = (timestamp) => {
-                            const elapsed = timestamp - start;
-                            const alpha = Math.min(elapsed / duration, 1);
-                            moveStep(startVector, endVector, alpha, offset);
-                            if (alpha < 1) {
-                                requestAnimationFrame(updateCounter);
-                            } else {
-                                console.log(element.position);
-                                console.log("currentPoint : ", this.currentPoint);
-                                console.log("focusPoint : ", this.focusPoint);
-                                const oldPoint = this.currentPoint;
-                                this.currentPoint = this.focusPoint;
-                                console.log("oldPoint : ", oldPoint);
-                                console.log("currentPoint : ", this.currentPoint);
-                                console.log("focusPoint : ", this.focusPoint);
-                                this.setFocus(oldPoint);
-                                this.lookPoint(focusPoint);
-                                console.log("oldPoint : ", oldPoint);
-                                console.log("currentPoint : ", this.currentPoint);
-                                console.log("focusPoint : ", this.focusPoint);
-                            }
-                        }
-
-                        const moveStep = (startVector, endVector, alpha, offset) => {
-                            const nextVector = startVector.clone().lerp(endVector, alpha);
-                            nextVector.add(offset);
-                            element.position.copy(nextVector);
-                            // console.log(element.position);
-                        }
-
-
-                        requestAnimationFrame(updateCounter);
+                        this.lookPoint(this.focusPoint);
+                        moveCamera(this.currentPoint, this.focusPoint, this.camera, this.offset);
+                        this.oldPoint = this.currentPoint;
+                        this.currentPoint = this.focusPoint;
+                        this.setFocus(this.oldPoint);
+                        this.lookPoint(this.focusPoint);
                         break;
+
+                    case "ArrowDown":
+                        console.log("ArrowDown");
+                        this.lookPoint(this.oldPoint);
+                        moveCamera(this.currentPoint, this.oldPoint, this.camera, this.offset);
+                        this.oldPoint = this.currentPoint;
+                        this.currentPoint = this.oldPoint;
+                        this.setFocus(this.oldPoint);
+                        this.lookPoint(this.focusPoint);
+                        break;
+
                     case "ArrowLeft":
-                        // console.log("ArrowLeft");
-                        // Faire quelque chose pour la touche "left arrow" pressée.
                         for (let i = 0; i < linkedPoint.length; i++) {
                             let x = null;
                             if (this.mapPoint.get(linkedPoint[i]) === this.focusPoint) {
@@ -179,7 +183,7 @@ export class Cam {
                                     x = i - 1;
                                 }
                                 if (x !== null) {
-                                    this.focusPoint = this.mapPoint.get(linkedPoint[x])
+                                    this.focusPoint = this.mapPoint.get(linkedPoint[x]);
                                     this.lookPoint(this.focusPoint);
                                 }
                                 break;
@@ -187,10 +191,8 @@ export class Cam {
                         }
                         console.log(this.focusPoint);
                         break;
-                    case "ArrowRight":
-                        // console.log("ArrowRight");
-                        // Faire quelque chose pour la touche "right arrow" pressée.
 
+                    case "ArrowRight":
                         for (let i = 0; i < linkedPoint.length; i++) {
                             let x = null;
                             if (this.mapPoint.get(linkedPoint[i]) === this.focusPoint) {
@@ -200,42 +202,45 @@ export class Cam {
                                     x = i + 1;
                                 }
                                 if (x !== null) {
-                                    this.focusPoint = this.mapPoint.get(linkedPoint[x])
+                                    this.focusPoint = this.mapPoint.get(linkedPoint[x]);
                                     this.lookPoint(this.focusPoint);
                                 }
                                 break;
                             }
-
                         }
                         console.log(this.focusPoint);
                         break;
+
                     case "KeyS":
                         console.log("S");
                         this.camera.position.add(new Vector3(-1, 1, 0));
                         break;
+
                     case "KeyD":
                         console.log("D");
                         this.camera.position.add(new Vector3(-1, -1, 0));
                         break;
+
                     case "KeyW":
                         console.log("Z");
                         this.camera.position.add(new Vector3(1, -1, 0));
                         break;
+
                     case "KeyA":
                         console.log("Q");
                         this.camera.position.add(new Vector3(1, 1, 0));
                         break;
+
                     default:
-                        // console.log("Reste");
                         return; // Quitter lorsque cela ne gère pas l'événement touche.
                 }
 
-                // Annuler l'action par défaut pour éviter qu'elle ne soit traitée deux fois.
                 event.preventDefault();
             },
             true,
         );
     }
+
 
 }
 
