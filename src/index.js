@@ -269,7 +269,7 @@ loadMultipleJSON([
       console.log('Unfound rootTile.');
       return false;
     }
-    const rootTile = app.layers[0].root;
+    const rootTile = app.layerManager.layers[0].root;
     const rootTilePosition = rootTile.position;
     const rootTileBox = rootTile.boundingVolume.box;
     var boxMin = rootTileBox.min.clone();
@@ -307,7 +307,7 @@ loadMultipleJSON([
         // Store the on-entry terrain opacity and make the terrain almost
         // transparent.
         outsideOfZoneOfIntererst = false;
-        planarViewOpacityOnEntry = app.itownsView.tileLayer.opacity;
+        planarViewOpacityOnEntry = app.viewManager.itownsView.tileLayer.opacity;
         app.viewManager.itownsView.tileLayer.opacity = 0.2;
         return;
       }
@@ -329,7 +329,7 @@ loadMultipleJSON([
 
   return;
   (async () => {
-    app.orbitControls.enabled = false;
+    app.viewManager.orbitControls.enabled = false;
     const mapPoint = await buildPoint(configs['point']);
     const startPoint = findStart(mapPoint);
     // const startPoint = new Point(0, 0, 0);
@@ -337,7 +337,7 @@ loadMultipleJSON([
     const camera = new Cam(
       startPoint,
       mapPoint,
-      app.itownsView.camera.camera3D,
+      app.viewManager.itownsView.camera.camera3D,
       offset
     );
   })();
