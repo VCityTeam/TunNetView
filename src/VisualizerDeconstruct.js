@@ -8,7 +8,6 @@ import {
 import { ClippingPlane } from './ClippingPlane';
 import { TargetOrbitControlMesh } from './TargetOrbitControlMesh';
 import { ViewManager } from './ViewManager';
-import { createTopScene } from './sceneManagement';
 import { LayerManager } from './LayerManager';
 import { setUpCameraDefaults } from './cameraSetup';
 import { setupLoadingUI, setUpSpeedControls, setUpTargetDrag } from './uiSetup';
@@ -48,11 +47,25 @@ export class VisualizerDeconstruct {
     /** @type{ViewManager} */
     this.viewManager = new ViewManager(extent, options);
 
-    /** @type {Scene} modify scene + renderer to have mesh rendering on the top*/
-    this.topScene = createTopScene(this.viewManager.itownsView);
+    this.itownsView = this.viewManager.itownsView;
+    /** @type {Scene} */
+    this.topScene = new Scene();
+    this.itownsView.mainLoop.gfxEngine.renderer.autoClear = false;
+    this.itownsView.render = () => {
+      this.itownsView.mainLoop.gfxEngine.renderer.clear(); // clear buffers
+      this.itownsView.mainLoop.gfxEngine.renderer.render(
+        this.itownsView.scene,
+        this.itownsView.camera.camera3D
+      ); // render scene 1
+      this.itownsView.mainLoop.gfxEngine.renderer.clearDepth(); // clear depth buffer
+      this.itownsView.mainLoop.gfxEngine.renderer.render(
+        this.topScene,
+        this.itownsView.camera.camera3D
+      ); // render scene 2
+    };
 
     /** @type {ClippingPlane} */
-    this.clippingPlane = new ClippingPlane(this.viewManager.itownsView);
+    this.clippingPlane = new ClippingPlane(this.itownsView);
 
     this.layerManager = new LayerManager(
       layerConfigs,
@@ -95,7 +108,7 @@ export class VisualizerDeconstruct {
 
     this.viewManager.itownsView.scene.add(this.layerManager.globalBBMesh);
 
-    /** @type {HTMLElement} */
+    /** @type {Measure} */
     this.measure = null;
     if (options.measure) {
       {
@@ -103,6 +116,8 @@ export class VisualizerDeconstruct {
           this.viewManager.itownsView,
           this.layerManager
         );
+
+        this.topScene.add(this.measure.group);
 
         window.addEventListener('keyup', (event) => {
           if (event.key == 'Escape') {
@@ -113,33 +128,32 @@ export class VisualizerDeconstruct {
         this.measure.update();
       }
     }
-    {
-      this.viewManager.itownsView.scene.add(this.clippingPlane.quad);
 
-      this.clippingPlane.quad.position.set(
-        extent.center().x,
-        extent.center().y,
-        300
-      );
+    this.viewManager.itownsView.scene.add(this.clippingPlane.quad);
 
-      this.clippingPlane.quad.scale.set(1000, 1000, 1000);
+    this.clippingPlane.quad.position.set(
+      extent.center().x,
+      extent.center().y,
+      300
+    );
 
-      const transformControlsProcess = new RequestAnimationFrameProcess(30);
+    this.clippingPlane.quad.scale.set(1000, 1000, 1000);
 
-      this.clippingPlane.transformControls.addEventListener(
-        'dragging-changed',
-        (event) => {
-          this.orbitControls.enabled = !event.value;
-        }
-      );
+    const transformControlsProcess = new RequestAnimationFrameProcess(30);
 
-      // need to tick the rendering when quad visible since it's necessary to render due to the transform control and the camera is not moving
-      transformControlsProcess.start(() => {
-        if (!this.clippingPlane.quad.visible) return;
-        this.clippingPlane.transformControls.updateMatrixWorld();
-        this.viewManager.itownsView.render();
-      });
-    }
+    this.clippingPlane.transformControls.addEventListener(
+      'dragging-changed',
+      (event) => {
+        this.viewManager.orbitControls.enabled = !event.value;
+      }
+    );
+
+    // need to tick the rendering when quad visible since it's necessary to render due to the transform control and the camera is not moving
+    transformControlsProcess.start(() => {
+      if (!this.clippingPlane.quad.visible) return;
+      this.clippingPlane.transformControls.updateMatrixWorld();
+      this.viewManager.itownsView.render();
+    });
 
     // compute dynamically near and far
     this.viewManager.itownsView.addFrameRequester(
