@@ -9,7 +9,7 @@ import * as THREE from 'three';
 import { loadCavePath } from './LoadCavePath';
 import { Visualizer } from './Visualizer';
 import { Cam } from './CameraController';
-import { buildPoint, findStart, Point } from './Point';
+import { buildPoint, findStart } from './Point';
 import { VisualizerDeconstruct } from './VisualizerDeconstruct';
 
 // The PointCloudVisualizer widget stores the current camera position within
@@ -52,7 +52,7 @@ loadMultipleJSON([
 
   ///// Eventually, create the PointCloudVisualizer "application" with all
   // the above parameters.
-  const app = new VisualizerDeconstruct(extent, layersConfigs, {
+  const app = new Visualizer(extent, layersConfigs, {
     parentDomElement: document.body,
     domElementClass: 'full_screen',
     defaultPointCloudSize: DEFAULT_POINT_SIZE,
@@ -76,7 +76,7 @@ loadMultipleJSON([
   const isTextureFormat =
     configs['elevation']['format'] == 'image/jpeg' ||
     configs['elevation']['format'] == 'image/png';
-  app.viewManager.itownsView.addLayer(
+  app.itownsView.addLayer(
     new itowns.ElevationLayer(configs['elevation']['layer_name'], {
       useColorTextureElevation: isTextureFormat,
       colorTextureElevationMinZ: isTextureFormat
@@ -98,7 +98,7 @@ loadMultipleJSON([
 
   // Add basemaps
   configs['base_maps'].forEach((baseMapConfig) => {
-    app.viewManager.itownsView.addLayer(
+    app.itownsView.addLayer(
       new itowns.ColorLayer(baseMapConfig.name, {
         updateStrategy: {
           type: itowns.STRATEGY_DICHOTOMY,
@@ -149,9 +149,9 @@ loadMultipleJSON([
 
   // initScene() is here used on the sole purpose of defining an ambient light.
   initScene(
-    app.viewManager.itownsView.camera.camera3D,
-    app.viewManager.itownsView.mainLoop.gfxEngine.renderer,
-    app.viewManager.itownsView.scene
+    app.itownsView.camera.camera3D,
+    app.itownsView.mainLoop.gfxEngine.renderer,
+    app.itownsView.scene
   );
 
   /////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ loadMultipleJSON([
   uiDomElement.classList.add('full_screen');
   ui.appendChild(uiDomElement);
 
-  const widget3dTilesThroughURL = new C3DTiles(app.viewManager.itownsView, {
+  const widget3dTilesThroughURL = new C3DTiles(app.itownsView, {
     parentElement: uiDomElement,
     // We wish to use @ud-viz/widget_layer_choice for listing the layers:
     displayExistingLayers: false,
@@ -183,7 +183,7 @@ loadMultipleJSON([
   widget3dTilesThroughURL.domElement.setAttribute('id', 'widgets-3dtiles');
 
   ///////// Add a layer choice widget
-  const layerChoice = new LayerChoice(app.viewManager.itownsView);
+  const layerChoice = new LayerChoice(app.itownsView);
   layerChoice.domElement.classList.add('widget_layer_choice');
 
   const uiLayerChoiceDomElement = document.createElement('div');
@@ -210,7 +210,7 @@ loadMultipleJSON([
   const loaderCavePath = async () => {
     const offset = await syntheticCavesLoaded();
     // console.log(offset);
-    const object = await loadCavePath(app.viewManager.itownsView.scene);
+    const object = await loadCavePath(app.itownsView.scene);
     // console.log(object);
     // const offset = new THREE.Vector3(1841729.466334, 5175204.02523159, 260.177757835388);
     if (!offset.equals(new THREE.Vector3(0, 0, 0))) {
@@ -307,8 +307,8 @@ loadMultipleJSON([
         // Store the on-entry terrain opacity and make the terrain almost
         // transparent.
         outsideOfZoneOfIntererst = false;
-        planarViewOpacityOnEntry = app.viewManager.itownsView.tileLayer.opacity;
-        app.viewManager.itownsView.tileLayer.opacity = 0.2;
+        planarViewOpacityOnEntry = app.itownsView.tileLayer.opacity;
+        app.itownsView.tileLayer.opacity = 0.2;
         return;
       }
     } else {
@@ -317,7 +317,7 @@ loadMultipleJSON([
         // We were inside the zone of interest and we are exiting from it.
         // Restore the initial value of the opacity.
         outsideOfZoneOfIntererst = true;
-        app.viewManager.itownsView.tileLayer.opacity = planarViewOpacityOnEntry;
+        app.itownsView.tileLayer.opacity = planarViewOpacityOnEntry;
         planarViewOpacityOnEntry = -1.0; // On debug purposes
         return;
       }
@@ -337,7 +337,7 @@ loadMultipleJSON([
     const camera = new Cam(
       startPoint,
       mapPoint,
-      app.viewManager.itownsView.camera.camera3D,
+      app.itownsView.camera.camera3D,
       offset
     );
   })();
