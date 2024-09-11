@@ -1,6 +1,5 @@
 import { colorSpace, loadMultipleJSON } from '@ud-viz/utils_browser';
 import * as proj4 from 'proj4';
-import { PointCloudVisualizer } from '@ud-viz/point_cloud_visualizer';
 import { LayerChoice } from '@ud-viz/widget_layer_choice';
 import { C3DTiles } from '@ud-viz/widget_3d_tiles';
 import { initScene } from '@ud-viz/utils_browser';
@@ -11,6 +10,7 @@ import { loadCavePath } from './LoadCavePath';
 import { Visualizer } from './Visualizer';
 import { Cam } from './CameraController';
 import { buildPoint, findStart, Point } from './Point';
+import { VisualizerDeconstruct } from './VisualizerDeconstruct';
 
 // The PointCloudVisualizer widget stores the current camera position within
 // the local storage so that the rendering remains unchanged on scene reload.
@@ -52,7 +52,7 @@ loadMultipleJSON([
 
   ///// Eventually, create the PointCloudVisualizer "application" with all
   // the above parameters.
-  const app = new Visualizer(extent, layersConfigs, {
+  const app = new VisualizerDeconstruct(extent, layersConfigs, {
     parentDomElement: document.body,
     domElementClass: 'full_screen',
     defaultPointCloudSize: DEFAULT_POINT_SIZE,
@@ -76,7 +76,7 @@ loadMultipleJSON([
   const isTextureFormat =
     configs['elevation']['format'] == 'image/jpeg' ||
     configs['elevation']['format'] == 'image/png';
-  app.itownsView.addLayer(
+  app.viewManager.itownsView.addLayer(
     new itowns.ElevationLayer(configs['elevation']['layer_name'], {
       useColorTextureElevation: isTextureFormat,
       colorTextureElevationMinZ: isTextureFormat
@@ -98,7 +98,7 @@ loadMultipleJSON([
 
   // Add basemaps
   configs['base_maps'].forEach((baseMapConfig) => {
-    app.itownsView.addLayer(
+    app.viewManager.itownsView.addLayer(
       new itowns.ColorLayer(baseMapConfig.name, {
         updateStrategy: {
           type: itowns.STRATEGY_DICHOTOMY,
@@ -149,9 +149,9 @@ loadMultipleJSON([
 
   // initScene() is here used on the sole purpose of defining an ambient light.
   initScene(
-    app.itownsView.camera.camera3D,
-    app.itownsView.mainLoop.gfxEngine.renderer,
-    app.itownsView.scene
+    app.viewManager.itownsView.camera.camera3D,
+    app.viewManager.itownsView.mainLoop.gfxEngine.renderer,
+    app.viewManager.itownsView.scene
   );
 
   /////////////////////////////////////////////////////////////////////////
@@ -166,16 +166,16 @@ loadMultipleJSON([
   app.domElementTargetDragElement.classList.add('drag_element');
   ui.appendChild(app.domElementTargetDragElement);
   // measure
-  ui.appendChild(app.measureDomElement);
+  ui.appendChild(app.measure ? app.measure.domElement : null);
   // camera near far
-  ui.appendChild(app.clippingPlaneDetails);
+  ui.appendChild(app.clippingPlane.UI.details);
 
   //////// Widget allowing to provide an URL of a 3DTiles tileset
   const uiDomElement = document.createElement('div');
   uiDomElement.classList.add('full_screen');
   ui.appendChild(uiDomElement);
 
-  const widget3dTilesThroughURL = new C3DTiles(app.itownsView, {
+  const widget3dTilesThroughURL = new C3DTiles(app.viewManager.itownsView, {
     parentElement: uiDomElement,
     // We wish to use @ud-viz/widget_layer_choice for listing the layers:
     displayExistingLayers: false,
@@ -183,7 +183,7 @@ loadMultipleJSON([
   widget3dTilesThroughURL.domElement.setAttribute('id', 'widgets-3dtiles');
 
   ///////// Add a layer choice widget
-  const layerChoice = new LayerChoice(app.itownsView);
+  const layerChoice = new LayerChoice(app.viewManager.itownsView);
   layerChoice.domElement.classList.add('widget_layer_choice');
 
   const uiLayerChoiceDomElement = document.createElement('div');
@@ -192,28 +192,25 @@ loadMultipleJSON([
 
   const syntheticCavesLoaded = () => {
     return new Promise((resolve) => {
-
-      app.layers.forEach((layer) => {
-
-        if (layer.name === "Synthetic_caves") {
-          layer.addEventListener(itowns.C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED, (
-            layerLoaded
-          ) => {
-            // console.log(layerLoaded);
-            const offset = layerLoaded.tileContent.position.clone();
-            resolve(offset);
-          })
+      app.layerManager.layers.forEach((layer) => {
+        if (layer.name === 'Synthetic_caves') {
+          layer.addEventListener(
+            itowns.C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED,
+            (layerLoaded) => {
+              // console.log(layerLoaded);
+              const offset = layerLoaded.tileContent.position.clone();
+              resolve(offset);
+            }
+          );
         }
-      })
-
+      });
     });
-  }
-
+  };
 
   const loaderCavePath = async () => {
     const offset = await syntheticCavesLoaded();
     // console.log(offset);
-    const object = await loadCavePath(app.itownsView.scene);
+    const object = await loadCavePath(app.viewManager.itownsView.scene);
     // console.log(object);
     // const offset = new THREE.Vector3(1841729.466334, 5175204.02523159, 260.177757835388);
     if (!offset.equals(new THREE.Vector3(0, 0, 0))) {
@@ -221,8 +218,8 @@ loadMultipleJSON([
       // FIX ME PLEASE
       object.position.sub(new THREE.Vector3(1.5, 1.5, 0));
     }
-  }
-  loaderCavePath()
+  };
+  loaderCavePath();
 
   layerChoice.addEventListener(LayerChoice.EVENT.FOCUS_3D_TILES, (data) => {
     const bb = data.message.layerFocused.root.boundingVolume.box;
@@ -231,6 +228,7 @@ loadMultipleJSON([
       .clone()
       .add(center.clone());
     app.orbitControls.target.copy(target);
+    app.orbitControls.update();
   });
 
   uiLayerChoiceDomElement.appendChild(layerChoice.domElement);
@@ -263,11 +261,11 @@ loadMultipleJSON([
   function isCameraInsideZoneOfInterest(app) {
     // Consider the first point cloud managed by the PointCloudVisualizer
     // and compute the center of its bounding box.
-    if (typeof app.layers[0] === 'undefined') {
+    if (typeof app.layerManager.layers[0] === 'undefined') {
       console.log('Unfound point cloud.');
       return false;
     }
-    if (typeof app.layers[0].root === 'undefined') {
+    if (typeof app.layerManager.layers[0].root === 'undefined') {
       console.log('Unfound rootTile.');
       return false;
     }
@@ -285,7 +283,7 @@ loadMultipleJSON([
 
     // When we are close enough (using some empirical criteria) when change
     // the opacity of the terrain layer
-    const cameraPosition = app.orbitControls.object.position;
+    const cameraPosition = app.viewManager.orbitControls.object.position;
     const closeEnough = cameraPosition.distanceTo(boxCenter) - boxDiagonal;
 
     if (closeEnough < 0) {
@@ -302,7 +300,7 @@ loadMultipleJSON([
   var planarViewOpacityOnEntry = 1.0; // In theory, it could be any value.
   var outsideOfZoneOfIntererst = isCameraInsideZoneOfInterest(app);
 
-  app.orbitControls.addEventListener('change', (event) => {
+  app.viewManager.orbitControls.addEventListener('change', (event) => {
     if (isCameraInsideZoneOfInterest(app)) {
       if (outsideOfZoneOfIntererst) {
         // We were outside of the zone of interest and we are entering it.
@@ -310,7 +308,7 @@ loadMultipleJSON([
         // transparent.
         outsideOfZoneOfIntererst = false;
         planarViewOpacityOnEntry = app.itownsView.tileLayer.opacity;
-        app.itownsView.tileLayer.opacity = 0.2;
+        app.viewManager.itownsView.tileLayer.opacity = 0.2;
         return;
       }
     } else {
@@ -319,7 +317,7 @@ loadMultipleJSON([
         // We were inside the zone of interest and we are exiting from it.
         // Restore the initial value of the opacity.
         outsideOfZoneOfIntererst = true;
-        app.itownsView.tileLayer.opacity = planarViewOpacityOnEntry;
+        app.viewManager.itownsView.tileLayer.opacity = planarViewOpacityOnEntry;
         planarViewOpacityOnEntry = -1.0; // On debug purposes
         return;
       }
@@ -327,19 +325,20 @@ loadMultipleJSON([
     // There was no contradiction between where we thought we were (be it
     // outside of inside) and were we are. We thus didn't cross the ZOI
     // border and hence the opacity remains unchanged.
-
   });
 
-
-  app.orbitControls.enabled = false;
-
+  return;
   (async () => {
+    app.orbitControls.enabled = false;
     const mapPoint = await buildPoint(configs['point']);
     const startPoint = findStart(mapPoint);
     // const startPoint = new Point(0, 0, 0);
     const offset = await syntheticCavesLoaded();
-    const camera = new Cam(startPoint, mapPoint, app.itownsView.camera.camera3D, offset);
+    const camera = new Cam(
+      startPoint,
+      mapPoint,
+      app.itownsView.camera.camera3D,
+      offset
+    );
   })();
-
-  if (event.key == 'p') console.log(app);
 });
