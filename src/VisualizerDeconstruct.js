@@ -113,7 +113,8 @@ export class VisualizerDeconstruct {
       {
         this.measure = new Measure(
           this.viewManager.itownsView,
-          this.layerManager
+          this.layerManager,
+          this.viewManager.itownsView.mainLoop.gfxEngine.label2dRenderer.domElement
         );
 
         this.topScene.add(this.measure.group);
@@ -124,7 +125,7 @@ export class VisualizerDeconstruct {
           }
         });
 
-        this.measure.update();
+        this.measure.update(this.itownsView);
       }
     }
 
