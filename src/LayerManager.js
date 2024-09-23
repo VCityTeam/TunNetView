@@ -101,11 +101,8 @@ export class LayerManager {
    * @param {Event} event - mouse event
    * @returns {object} - intersects object on pointcloud layers
    */
-  eventTo3DTilesIntersect(event) {
-    this.raycaster.setFromCamera(
-      this.eventToMouseCoord(event),
-      this.itownsView.camera.camera3D
-    );
+  eventTo3DTilesIntersect(event, camera3D) {
+    this.raycaster.setFromCamera(this.eventToMouseCoord(event), camera3D);
 
     let minDist = Infinity;
     let result = null;
