@@ -16,23 +16,28 @@ import {
 } from 'three';
 
 /**
- * @typedef {Object} ClippingPlaneUI
- * @property {HTMLDetailsElement} details
- * @property {HTMLInputElement} planeVisible
- * @property {HTMLInputElement} clippingPlane
- * @property {HTMLButtonElement} translateButton
- * @property {HTMLButtonElement} rotateButton
- * @property {HTMLButtonElement} scaleButton
+ * Representing a clipping plane in a 3D visualization
+ * UI controls for manipulating the plane (managing its visibility and transformation)
  */
 export class ClippingPlane {
   constructor(itownsView) {
+    /** @type {Plane} */
     this.plane = new Plane();
 
     /**@type {PlanarView} */
     this.itownsView = itownsView;
 
-    /** @type {ClippingPlaneUI} */
-    this.UI = {};
+    /** @type {HTMLDivElement} */
+    this.domElement = document.createElement('div');
+
+    /** @type {HTMLDetailsElement}*/
+    this.details = null;
+    /** @type {HTMLInputElement}*/
+    this.planeVisible = null;
+    /** @type {HTMLInputElement}*/
+    this.clippingEnable = null;
+    /** @type {Array<HTMLButtonElement>}*/
+    this.buttons = [];
 
     /**@type {TransformControls} */
     this.transformControls = null;
@@ -47,33 +52,34 @@ export class ClippingPlane {
   }
 
   initUI() {
-    this.UI.details = createLocalStorageDetails(
+    this.details = createLocalStorageDetails(
       'clipping_plane_local_storage_key_point_cloud_visualizer',
       'Clipping plane',
-      null
+      this.domElement
     );
 
-    this.UI.planeVisible = createLocalStorageCheckbox(
+    this.planeVisible = createLocalStorageCheckbox(
       'plane_visibility_key_loacal_storage',
       'Visible: ',
-      this.UI.details,
+      this.details,
       true
     );
 
-    this.UI.clippingEnable = createLocalStorageCheckbox(
+    this.clippingEnable = createLocalStorageCheckbox(
       'plane_enable_key_loacal_storage',
       'Enable: ',
-      this.UI.details
+      this.details
     );
 
     const mode = ['translate', 'rotate', 'scale'];
+    this.buttons = [];
 
     mode.forEach((m) => {
       const buttonMode = document.createElement('button');
       buttonMode.innerText = m;
       buttonMode.mode = m;
-      this.UI[m + 'Button'] = buttonMode;
-      this.UI.details.appendChild(buttonMode);
+      this.buttons[m + 'Button'] = buttonMode;
+      this.details.appendChild(buttonMode);
     });
   }
 
@@ -118,7 +124,7 @@ export class ClippingPlane {
   }
 
   initCallback() {
-    this.UI.planeVisible.addEventListener('change', (event) => {
+    this.planeVisible.addEventListener('change', (event) => {
       this.quad.visible = event.target.checked;
       if (this.quad.visible) {
         this.transformControls.attach(this.quad);
@@ -129,20 +135,16 @@ export class ClippingPlane {
       this.itownsView.notifyChange();
     });
 
-    this.UI.clippingEnable.addEventListener('change', (event) => {
+    this.clippingEnable.addEventListener('change', (event) => {
       this.itownsView.mainLoop.gfxEngine.renderer.localClippingEnabled =
         event.target.checked;
       this.itownsView.notifyChange();
     });
 
-    [
-      this.UI.translateButton,
-      this.UI.rotateButton,
-      this.UI.scaleButton,
-    ].forEach((button) => {
+    this.buttons.forEach((button) => {
       button.addEventListener('click', () => {
         this.transformControls.setMode(button.mode);
-        this.UI.planeVisible.dispatchEvent(new Event('change'));
+        this.planeVisible.dispatchEvent(new Event('change'));
       });
     });
   }
