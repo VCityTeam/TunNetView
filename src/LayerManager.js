@@ -67,7 +67,7 @@ export class LayerManager {
         });
         if (typePoint) {
           tileContent.traverse((child) => {
-            if (child.material) child.material = this.pointCloudMaterial;
+            if (child.material) child.material = this.pointsCloudMaterial;
           });
         } else {
           tileContent.traverse((child) => {

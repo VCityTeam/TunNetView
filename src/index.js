@@ -52,7 +52,7 @@ loadMultipleJSON([
 
   ///// Eventually, create the PointCloudVisualizer "application" with all
   // the above parameters.
-  const app = new Visualizer(extent, layersConfigs, {
+  const app = new VisualizerDeconstruct(extent, layersConfigs, {
     parentDomElement: document.body,
     domElementClass: 'full_screen',
     defaultPointCloudSize: DEFAULT_POINT_SIZE,
@@ -317,7 +317,6 @@ loadMultipleJSON([
         outsideOfZoneOfIntererst = false;
         planarViewOpacityOnEntry = app.itownsView.tileLayer.opacity;
         app.itownsView.tileLayer.opacity = 0.2;
-        return;
       }
     } else {
       // The camera is outside the zone of interest
@@ -326,8 +325,7 @@ loadMultipleJSON([
         // Restore the initial value of the opacity.
         outsideOfZoneOfIntererst = true;
         app.itownsView.tileLayer.opacity = planarViewOpacityOnEntry;
-        planarViewOpacityOnEntry = -1.0; // On debug purposes
-        return;
+        planarViewOpacityOnEntry = 0.0; // On debug purposes
       }
     }
     // There was no contradiction between where we thought we were (be it

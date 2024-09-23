@@ -68,7 +68,7 @@ export class VisualizerDeconstruct {
 
     this.layerManager = new LayerManager(
       layerConfigs,
-      this.viewManager.itownsView,
+      this.itownsView,
       new PointsMaterial({
         size:
           options.defaultPointCloudSize ||
