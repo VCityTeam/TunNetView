@@ -47,7 +47,6 @@ export class VisualizerDeconstruct {
     /** @type{ViewManager} */
     this.viewManager = new ViewManager(extent, options);
 
-    this.itownsView = this.viewManager.itownsView;
     /** @type {Scene} */
     this.topScene = new Scene();
     this.itownsView.mainLoop.gfxEngine.renderer.autoClear = false;
@@ -224,6 +223,18 @@ export class VisualizerDeconstruct {
         }
       });
     });
+  }
+
+  get itownsView() {
+    return this.viewManager.itownsView;
+  }
+
+  get orbitControls() {
+    return this.viewManager.orbitControls;
+  }
+
+  get layers() {
+    return this.layerManager.layers;
   }
 
   static get DEFAULT_POINT_SIZE() {
