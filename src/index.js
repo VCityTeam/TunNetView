@@ -166,9 +166,17 @@ loadMultipleJSON([
   app.domElementTargetDragElement.classList.add('drag_element');
   ui.appendChild(app.domElementTargetDragElement);
   // measure
-  ui.appendChild(app.measure ? app.measure.domElement : null);
+  if (app.measure) ui.appendChild(app.measure.domElement);
+
+  // Test for keep old visualizer API
+  const clippingPlaneDomElement =
+    app.clippingPlane && app.clippingPlane.domElement
+      ? app.clippingPlane.domElement
+      : app.clippingPlaneDetails
+      ? app.clippingPlaneDetails
+      : null;
   // camera near far
-  ui.appendChild(app.clippingPlane.UI.details);
+  if (clippingPlaneDomElement) ui.appendChild(clippingPlaneDomElement);
 
   //////// Widget allowing to provide an URL of a 3DTiles tileset
   const uiDomElement = document.createElement('div');
@@ -192,7 +200,7 @@ loadMultipleJSON([
 
   const syntheticCavesLoaded = () => {
     return new Promise((resolve) => {
-      app.layerManager.layers.forEach((layer) => {
+      app.layers.forEach((layer) => {
         if (layer.name === 'Synthetic_caves') {
           layer.addEventListener(
             itowns.C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED,
@@ -261,15 +269,15 @@ loadMultipleJSON([
   function isCameraInsideZoneOfInterest(app) {
     // Consider the first point cloud managed by the PointCloudVisualizer
     // and compute the center of its bounding box.
-    if (typeof app.layerManager.layers[0] === 'undefined') {
+    if (typeof app.layers[0] === 'undefined') {
       console.log('Unfound point cloud.');
       return false;
     }
-    if (typeof app.layerManager.layers[0].root === 'undefined') {
+    if (typeof app.layers[0].root === 'undefined') {
       console.log('Unfound rootTile.');
       return false;
     }
-    const rootTile = app.layerManager.layers[0].root;
+    const rootTile = app.layers[0].root;
     const rootTilePosition = rootTile.position;
     const rootTileBox = rootTile.boundingVolume.box;
     var boxMin = rootTileBox.min.clone();
@@ -283,7 +291,7 @@ loadMultipleJSON([
 
     // When we are close enough (using some empirical criteria) when change
     // the opacity of the terrain layer
-    const cameraPosition = app.viewManager.orbitControls.object.position;
+    const cameraPosition = app.orbitControls.object.position;
     const closeEnough = cameraPosition.distanceTo(boxCenter) - boxDiagonal;
 
     if (closeEnough < 0) {
@@ -300,7 +308,7 @@ loadMultipleJSON([
   var planarViewOpacityOnEntry = 1.0; // In theory, it could be any value.
   var outsideOfZoneOfIntererst = isCameraInsideZoneOfInterest(app);
 
-  app.viewManager.orbitControls.addEventListener('change', (event) => {
+  app.orbitControls.addEventListener('change', (event) => {
     if (isCameraInsideZoneOfInterest(app)) {
       if (outsideOfZoneOfIntererst) {
         // We were outside of the zone of interest and we are entering it.
