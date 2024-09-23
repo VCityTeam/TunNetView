@@ -62,7 +62,7 @@ export class ClippingPlane {
       'plane_visibility_key_loacal_storage',
       'Visible: ',
       this.details,
-      true
+      false
     );
 
     this.clippingEnable = createLocalStorageCheckbox(
@@ -93,6 +93,7 @@ export class ClippingPlane {
       })
     );
 
+    this.quad.visible = false;
     this.quad.name = 'quadOfClippingPlane';
   }
 
