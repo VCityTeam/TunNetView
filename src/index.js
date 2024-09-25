@@ -333,10 +333,9 @@ loadMultipleJSON([
     // border and hence the opacity remains unchanged.
   });
 
-  return;
   (async () => {
     app.viewManager.orbitControls.enabled = false;
-    const mapPoint = await buildPoint(configs['point']);
+    const mapPoint = buildPoint(configs['point']);
     const startPoint = findStart(mapPoint);
     // const startPoint = new Point(0, 0, 0);
     const offset = await syntheticCavesLoaded();
