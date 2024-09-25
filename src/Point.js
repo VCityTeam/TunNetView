@@ -40,6 +40,17 @@ export function buildPoint(jsonData) {
   return mapPoint;
 }
 
+/**
+ * Return the point which will be the start and where the camera will be placed in the world.
+ * @example
+ * (async () => {
+ *  const mapPoint = await buildPoint('path/to/point.json');
+ *  const startPoint = findStart(mapPoint);
+ *  console.log(`Start Point: (${startPoint.getX()}, ${startPoint.getY()}, ${startPoint.getZ()})`);
+ *  })();
+ * @param mapPoint - Map object containing points.
+ * @returns Returning the first point where the linked points array has a length of 1.
+ */
 export function findStart(mapPoint) {
   for (const point of mapPoint.values()) {
     if (point.getLinkedPoint().length === 1) {
@@ -47,11 +58,3 @@ export function findStart(mapPoint) {
     }
   }
 }
-
-// Usage example:
-/*(async () => {
-    const mapPoint = await buildPoint('path/to/point.json');
-    const startPoint = findStart(mapPoint);
-    console.log(`Start Point: (${startPoint.getX()}, ${startPoint.getY()}, ${startPoint.getZ()})`);
-})();
-*/
