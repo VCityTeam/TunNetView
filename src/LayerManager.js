@@ -71,7 +71,10 @@ export class LayerManager {
           });
         } else {
           tileContent.traverse((child) => {
-            if (child.material) child.material.side = DoubleSide;
+            if (child.material) {
+              child.material.side = DoubleSide;
+              child.material.roughness = 1;
+            }
           });
         }
       }
