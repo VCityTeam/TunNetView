@@ -24,9 +24,9 @@ export class CameraController {
       this.currentPoint.getY(),
       this.currentPoint.getZ()
     );
-    console.log('CameraPosition', this.camera.position);
     this.camera.position.add(offset);
-    console.log('CameraPosition Offseted', this.camera.position);
+
+    this.cameraIsMoving = false;
     this.setFocus();
     this.addListener();
   }
@@ -66,6 +66,7 @@ export class CameraController {
   }
 
   moveCamera(startPoint, endPoint, element, offset, duration = 1000) {
+    this.cameraIsMoving = true;
     return new Promise((resolve) => {
       const start = performance.now();
       const startVector = new Vector3(
@@ -87,6 +88,7 @@ export class CameraController {
           requestAnimationFrame(updateCounter);
         } else {
           console.log('Position camera', element.position);
+          this.cameraIsMoving = false;
           resolve();
         }
         this.itownsView.notifyChange();
@@ -119,6 +121,7 @@ export class CameraController {
 
           case 'ArrowUp':
             console.log('ArrowUp');
+            if (this.cameraIsMoving) return;
             this.moveCamera(
               this.currentPoint,
               this.focusPoint,

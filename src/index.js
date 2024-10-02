@@ -350,13 +350,13 @@ loadMultipleJSON([
       app.itownsView.notifyChange();
     });
 
-    // app.viewManager.orbitControls.enabled = false;
+    app.viewManager.orbitControls.enabled = false;
 
-    // const camera = new CameraController(
-    //   startPoint,
-    //   mapPoint,
-    //   app.itownsView,
-    //   offset
-    // );
+    const camera = new CameraController(
+      startPoint,
+      mapPoint,
+      app.itownsView,
+      offset
+    );
   })();
 });
