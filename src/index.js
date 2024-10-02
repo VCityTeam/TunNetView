@@ -8,7 +8,7 @@ import * as THREE from 'three';
 
 import { loadCavePath } from './LoadCavePath';
 import { Visualizer } from './Visualizer';
-import { Cam } from './CameraController';
+import { CameraController } from './CameraController';
 import { buildPoint, findStart } from './Point';
 import { VisualizerDeconstruct } from './VisualizerDeconstruct';
 
@@ -337,12 +337,25 @@ loadMultipleJSON([
     app.viewManager.orbitControls.enabled = false;
     const mapPoint = buildPoint(configs['point']);
     const startPoint = findStart(mapPoint);
+
     // const startPoint = new Point(0, 0, 0);
+
     const offset = await syntheticCavesLoaded();
-    const camera = new Cam(
+    mapPoint.forEach((value, key, map) => {
+      const geometry = new THREE.SphereGeometry(1, 32, 16);
+      const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+      const sphere = new THREE.Mesh(geometry, material);
+      sphere.scale.set(0.01, 0.01, 0.01);
+      sphere.position.set(value.x, value.y, value.z);
+      sphere.position.add(offset);
+      app.itownsView.scene.add(sphere);
+      app.itownsView.notifyChange();
+    });
+
+    const camera = new CameraController(
       startPoint,
       mapPoint,
-      app.itownsView.camera.camera3D,
+      app.itownsView,
       offset
     );
   })();

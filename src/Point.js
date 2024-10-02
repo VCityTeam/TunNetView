@@ -44,7 +44,7 @@ export function buildPoint(jsonData) {
  * Return the point which will be the start and where the camera will be placed in the world.
  * @example
  * (async () => {
- *  const mapPoint = await buildPoint('path/to/point.json');
+ *  const mapPoint = buildPoint('path/to/point.json');
  *  const startPoint = findStart(mapPoint);
  *  console.log(`Start Point: (${startPoint.getX()}, ${startPoint.getY()}, ${startPoint.getZ()})`);
  *  })();

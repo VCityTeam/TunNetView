@@ -12,7 +12,9 @@ const { stringReplace } = require('string-replace-middleware');
  *
  * @type {string}
  */
-const syntheticCaveUrl = process.env.SYNTHETIC_CAVE_URL || 'https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_4_grid_size_x_1_grid_size_y_1_point_cloud-3dtiles/tileset-translated-to-lyon-cathedral.json';
+const syntheticCaveUrl =
+  process.env.SYNTHETIC_CAVE_URL ||
+  'https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_1_grid_size_x_1_grid_size_y_1_triangulation-3dtiles/tileset-translated-to-lyon-cathedral.json';
 console.log('Displaying this cave URL', syntheticCaveUrl);
 
 /**
@@ -49,4 +51,3 @@ app.listen(PORT, (err) => {
   }
   console.log('Http server listening on port', PORT);
 });
-
