@@ -163,8 +163,7 @@ loadMultipleJSON([
   ///// Mouse speed controls
   ui.appendChild(app.domElementSpeedControls);
   // drag element
-  app.domElementTargetDragElement.classList.add('drag_element');
-  ui.appendChild(app.domElementTargetDragElement);
+  ui.appendChild(app.targetOrbitControlsMesh.domElement);
   // measure
   if (app.measure) ui.appendChild(app.measure.domElement);
 
@@ -334,7 +333,6 @@ loadMultipleJSON([
   });
 
   (async () => {
-    app.viewManager.orbitControls.enabled = false;
     const mapPoint = buildPoint(configs['point']);
     const startPoint = findStart(mapPoint);
 
@@ -345,18 +343,20 @@ loadMultipleJSON([
       const geometry = new THREE.SphereGeometry(1, 32, 16);
       const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
       const sphere = new THREE.Mesh(geometry, material);
-      sphere.scale.set(0.01, 0.01, 0.01);
+      sphere.scale.set(0.05, 0.05, 0.05);
       sphere.position.set(value.x, value.y, value.z);
       sphere.position.add(offset);
       app.itownsView.scene.add(sphere);
       app.itownsView.notifyChange();
     });
 
-    const camera = new CameraController(
-      startPoint,
-      mapPoint,
-      app.itownsView,
-      offset
-    );
+    // app.viewManager.orbitControls.enabled = false;
+
+    // const camera = new CameraController(
+    //   startPoint,
+    //   mapPoint,
+    //   app.itownsView,
+    //   offset
+    // );
   })();
 });

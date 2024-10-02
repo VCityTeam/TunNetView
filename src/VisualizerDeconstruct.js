@@ -1,5 +1,5 @@
 import { MAIN_LOOP_EVENTS } from 'itowns';
-import { Scene, PointsMaterial, Box3, Raycaster, Vector3 } from 'three';
+import { Scene, PointsMaterial, Box3, Raycaster } from 'three';
 import {
   computeNearFarCamera,
   RequestAnimationFrameProcess,
@@ -10,7 +10,7 @@ import { TargetOrbitControlMesh } from './TargetOrbitControlMesh';
 import { ViewManager } from './ViewManager';
 import { LayerManager } from './LayerManager';
 import { setUpCameraDefaults } from './cameraSetup';
-import { setupLoadingUI, setUpSpeedControls, setUpTargetDrag } from './uiSetup';
+import { setupLoadingUI, setUpSpeedControls } from './uiSetup';
 import { Measure } from './Measure';
 
 /**
@@ -79,7 +79,9 @@ export class VisualizerDeconstruct {
     );
 
     this.targetOrbitControlsMesh = new TargetOrbitControlMesh(
-      this.viewManager.orbitControls
+      this.viewManager.orbitControls,
+      this.itownsView.camera.camera3D,
+      this.layerManager
     );
     this.topScene.add(this.targetOrbitControlsMesh.mesh);
 
@@ -101,9 +103,6 @@ export class VisualizerDeconstruct {
     this.domElementSpeedControls = setUpSpeedControls(
       this.viewManager.orbitControls
     );
-
-    // move orbit control target
-    this.domElementTargetDragElement = setUpTargetDrag();
 
     this.viewManager.itownsView.scene.add(this.layerManager.globalBBMesh);
 
@@ -172,58 +171,6 @@ export class VisualizerDeconstruct {
     this.viewManager.itownsView.notifyChange(
       this.viewManager.itownsView.camera.camera3D
     );
-  }
-
-  /**
-   *
-   * @param {Vector3} destPosition - destination position of the camera
-   * @param {Vector3} destTarget - destination target of the orbit controls
-   * @param {number} duration - duration in ms
-   * @returns {Promise} - promise resolving when the camera has moved
-   */
-  moveCamera(destPosition, destTarget, duration = 1500) {
-    if (!destPosition)
-      destPosition =
-        this.viewManager.itownsView.camera.camera3D.position.clone();
-    if (!destTarget) destTarget = this.viewManager.orbitControls.target.clone();
-    const startCameraPosition =
-      this.viewManager.itownsView.camera.camera3D.position.clone();
-    const startCameraTargetPosition = this.orbitControls.target.clone();
-
-    this.targetOrbitControlsMesh.visible = false;
-
-    this.viewManager.orbitControls.enabled = false;
-    const process = new RequestAnimationFrameProcess(30);
-
-    let currentDuration = 0;
-
-    return new Promise((resolve) => {
-      process.start((dt) => {
-        currentDuration += dt;
-        const ratio = Math.min(Math.max(0, currentDuration / duration), 1);
-
-        this.viewManager.itownsView.camera.camera3D.position.lerpVectors(
-          startCameraPosition,
-          destPosition,
-          ratio
-        );
-
-        this.viewManager.orbitControls.target.lerpVectors(
-          startCameraTargetPosition,
-          destTarget,
-          ratio
-        );
-
-        this.viewManager.orbitControls.update();
-
-        if (ratio == 1) {
-          this.viewManager.orbitControls.enabled = true;
-          this.targetOrbitControlsMesh.visible = true;
-          process.stop();
-          resolve();
-        }
-      });
-    });
   }
 
   get itownsView() {
