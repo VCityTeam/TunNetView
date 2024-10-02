@@ -105,18 +105,3 @@ export function setUpSpeedControls(orbitControls) {
 
   return domElementSpeedControls;
 }
-
-export function setUpTargetDrag() {
-  const element = document.createElement('div');
-
-  element.draggable = true;
-
-  element.ondragend = (event) => {
-    if (event.target === element) {
-      const i = this.eventTo3DTilesIntersect(event);
-      if (i) this.moveCamera(null, i.point, 500);
-    }
-  };
-
-  return element;
-}
