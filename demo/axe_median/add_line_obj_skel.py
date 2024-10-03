@@ -1,15 +1,13 @@
 class addLine:
 
-    def __init__(self, file, outfile):
-        self.file = file
+    def __init__(self, vectorsLines, outfile):
+        self.vectorsLines = vectorsLines
         self.outfile = outfile
-        with open(file, 'r') as f:  # Utilisation de 'with' pour une gestion automatique de la fermeture du fichier
-            self.__search(f)
+        self.__search()
             
             
-    def __search(self, f):
-        lines = f.readlines()  # Read all lines at once to avoid issues with nested iteration
-        
+    def __search(self):
+        lines = self.vectorsLines
         for i in range(len(lines)):
             x1, y1, z1 = lines[i].strip().split()
             x1 = int(x1)
