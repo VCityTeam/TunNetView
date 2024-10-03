@@ -24,7 +24,7 @@
   - "skel.sdp.scaled.sdp" : axe médian dans le système de coordonnées du
      maillage initial ; il est produit par la commande
      `python3  skel_scale_offset.py  skel.sdp  1.04167  32  -0  4.92224`
-     (commande intégrée au pipeline)
+     ([commande intégrée au pipeline](https://gitlab.liris.cnrs.fr/lombardi/grim/-/blob/main/grim-run-B.sh#L169))
 
 - le script de conversion de l'axe médian brut dans le système de coordonnées
   du maillage (`skel_scale_offset.py`)
