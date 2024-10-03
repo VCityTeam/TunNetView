@@ -20,7 +20,6 @@ localStorage.clear();
 loadMultipleJSON([
   './assets/config/extents.json',
   './assets/config/crs.json',
-  './assets/config/layer/3DTiles_point_cloud.json',
   './assets/config/layer/3DTiles.json',
   './assets/config/layer/elevation.json',
   './assets/config/layer/base_maps.json',
@@ -47,8 +46,8 @@ loadMultipleJSON([
   );
 
   // The point cloud that the application proposes to explore is by default
-  // the one designated by the 3DTiles_point_cloud.json asset file:
-  const layersConfigs = configs['3DTiles_point_cloud'];
+  // the one designated by the 3DTiles.json asset file:
+  const layersConfigs = configs['3DTiles'];
 
   ///// Eventually, create the PointCloudVisualizer "application" with all
   // the above parameters.
@@ -222,8 +221,6 @@ loadMultipleJSON([
     // const offset = new THREE.Vector3(1841729.466334, 5175204.02523159, 260.177757835388);
     if (!offset.equals(new THREE.Vector3(0, 0, 0))) {
       object.position.add(offset);
-      // FIX ME PLEASE
-      object.position.sub(new THREE.Vector3(1.5, 1.5, 0));
     }
   };
   loaderCavePath();
@@ -351,6 +348,7 @@ loadMultipleJSON([
     });
 
     app.viewManager.orbitControls.enabled = false;
+    app.targetOrbitControlsMesh.mesh.visible = false;
 
     const camera = new CameraController(
       startPoint,
