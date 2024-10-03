@@ -140,7 +140,6 @@ export class CameraController {
               console.warn('NO OLD POINT REGISTER PLEASE USE ARROW UP BEFORE');
               return;
             }
-            this.lookPoint(this.oldPoint);
             this.moveCamera(
               this.currentPoint,
               this.oldPoint,
