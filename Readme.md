@@ -27,3 +27,9 @@ npm run start
 ```bash
 open http://localhost:8000
 ```
+
+## Alternatives
+
+Two websites dedicated to 3D rendering of Lyon Fishbones tunnel systems
+- A [croud funded website](https://aretesdepoisson.org/)
+- A [publicly funded website](https://aretesdepoisson.lyon.fr/), described in a [press article in Le Monde](https://www.lemonde.fr/m-le-mag/article/2024/09/27/a-lyon-d-antiques-aretes-de-poisson-a-visiter-en-mode-virtuel_6337001_4500055.html).
