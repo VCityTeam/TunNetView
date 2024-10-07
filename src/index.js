@@ -340,10 +340,11 @@ loadMultipleJSON([
       const geometry = new THREE.SphereGeometry(1, 32, 16);
       const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
       const sphere = new THREE.Mesh(geometry, material);
-      sphere.scale.set(0.05, 0.05, 0.05);
+      sphere.scale.set(0.025, 0.025, 0.025);
       sphere.position.set(value.x, value.y, value.z);
       sphere.position.add(offset);
       app.itownsView.scene.add(sphere);
+      value.sphereMesh = sphere;
       app.itownsView.notifyChange();
     });
 
