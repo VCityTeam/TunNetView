@@ -1,4 +1,4 @@
-import { Camera, Vector3, Euler } from 'three';
+import { Camera, Vector3, Euler, MathUtils } from 'three';
 import { Point } from './Point';
 // Utiliser les fonctions importées
 
@@ -49,16 +49,40 @@ export class CameraController {
       console.warn('No linked point found to set as focus point');
     }
 
-    this.lookPoint(this.focusPoint);
+    return this.lookPoint(this.focusPoint);
   }
 
-  lookPoint(point) {
+  lookPoint(point, speedRotation = 0.1) {
     if (!point) return;
-    const lookedPoint = new Vector3(point.getX(), point.getY(), point.getZ());
-    lookedPoint.add(this.offset);
-    console.log('Target position', lookedPoint);
-    this.camera.lookAt(lookedPoint);
-    this.itownsView.notifyChange();
+    this.cameraIsMoving = true;
+    return new Promise((resolve) => {
+      const now = performance.now();
+      const startRotation = this.camera.quaternion.clone();
+      const lookedPoint = new Vector3(point.getX(), point.getY(), point.getZ());
+      lookedPoint.add(this.offset);
+      const tempCameraObject = this.camera.clone();
+      tempCameraObject.lookAt(lookedPoint);
+      const endRotation = tempCameraObject.quaternion;
+      const angleSE = MathUtils.radToDeg(startRotation.angleTo(endRotation));
+      const duration = angleSE / speedRotation;
+      const updateCounter = (timestamp) => {
+        const elapsed = timestamp - now;
+        const alpha = Math.min(elapsed / duration, 1);
+        const newRotation = startRotation
+          .clone()
+          .slerp(endRotation.clone(), alpha);
+        this.camera.quaternion.copy(newRotation);
+        if (alpha < 1) {
+          requestAnimationFrame(updateCounter);
+        } else {
+          this.cameraIsMoving = false;
+          resolve();
+        }
+        this.itownsView.notifyChange();
+      };
+
+      requestAnimationFrame(updateCounter);
+    });
   }
 
   move() {
@@ -152,6 +176,7 @@ export class CameraController {
             break;
 
           case 'ArrowLeft':
+            if (this.cameraIsMoving) return;
             for (let i = 0; i < linkedPoint.length; i++) {
               let x = null;
               if (this.mapPoint.get(linkedPoint[i]) === this.focusPoint) {
@@ -171,6 +196,7 @@ export class CameraController {
             break;
 
           case 'ArrowRight':
+            if (this.cameraIsMoving) return;
             for (let i = 0; i < linkedPoint.length; i++) {
               let x = null;
               if (this.mapPoint.get(linkedPoint[i]) === this.focusPoint) {
