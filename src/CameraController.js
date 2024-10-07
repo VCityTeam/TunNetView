@@ -52,7 +52,7 @@ export class CameraController {
     return this.lookPoint(this.focusPoint);
   }
 
-  lookPoint(point, speedRotation = 0.1) {
+  lookPoint(point, speedRotation = 0.25) {
     if (!point) return;
     this.cameraIsMoving = true;
     return new Promise((resolve) => {
@@ -76,6 +76,14 @@ export class CameraController {
           requestAnimationFrame(updateCounter);
         } else {
           this.cameraIsMoving = false;
+          this.currentPoint.linkedPoint.forEach((iNeighbourPoint) => {
+            const point = this.mapPoint.get(iNeighbourPoint);
+            if (point == this.focusPoint) {
+              point.sphereMesh.material.color.set(0x00ff00);
+            } else {
+              point.sphereMesh.material.color.set(0xff0000);
+            }
+          });
           resolve();
         }
         this.itownsView.notifyChange();
@@ -89,7 +97,7 @@ export class CameraController {
     this.camera.position.add(new Vector3(1.5, -1.5, 0));
   }
 
-  moveCamera(startPoint, endPoint, element, offset, duration = 1000) {
+  moveCamera(startPoint, endPoint, element, offset, duration = 500) {
     this.cameraIsMoving = true;
     return new Promise((resolve) => {
       const start = performance.now();
@@ -112,6 +120,10 @@ export class CameraController {
           requestAnimationFrame(updateCounter);
         } else {
           console.log('Position camera', element.position);
+          this.currentPoint.linkedPoint.forEach((iNeighbourPoint) => {
+            const point = this.mapPoint.get(iNeighbourPoint);
+            point.sphereMesh.material.color.set(0xffff00);
+          });
           this.cameraIsMoving = false;
           resolve();
         }
@@ -144,7 +156,6 @@ export class CameraController {
             break;
 
           case 'ArrowUp':
-            console.log('ArrowUp');
             if (this.cameraIsMoving) return;
             this.moveCamera(
               this.currentPoint,
@@ -159,7 +170,6 @@ export class CameraController {
             break;
 
           case 'ArrowDown':
-            console.log('ArrowDown');
             if (!this.oldPoint) {
               console.warn('NO OLD POINT REGISTER PLEASE USE ARROW UP BEFORE');
               return;
