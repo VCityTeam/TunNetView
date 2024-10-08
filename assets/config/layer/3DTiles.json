@@ -4,5 +4,11 @@
     "source": {
       "url": "SYNTHETIC_CAVE_URL"
     }
+  },
+  {
+    "name": "Buildings",
+    "source": {
+      "url": "https://dataset-dl.liris.cnrs.fr/three-d-tiles-lyon-metropolis/2018/Lyon-5_2018_Textured/tileset.json"
+    }
   }
 ]
