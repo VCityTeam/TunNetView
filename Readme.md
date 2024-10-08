@@ -54,6 +54,12 @@ npm run start &
 open http://localhost:$PORT
 ```
 
+For a higher resolution of the cave use e.g.
+
+```bash
+export SYNTHETIC_CAVE_URL=https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_4_grid_size_x_1_grid_size_y_1_triangulation-3dtiles/tileset-translated-to-lyon-cathedral.json
+```
+
 ## Running with docker
 
 Refer to the [TunNetView-docker](https://github.com/VCityTeam/TunNetView-docker) repository.
