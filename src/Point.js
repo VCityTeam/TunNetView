@@ -3,6 +3,7 @@ export class Point {
     this.x = parseFloat(x);
     this.y = parseFloat(y);
     this.z = parseFloat(z);
+    this.mesh;
     this.linkedPoint = [];
   }
 
@@ -20,6 +21,10 @@ export class Point {
 
   getLinkedPoint() {
     return this.linkedPoint;
+  }
+
+  bindMesh(mesh) {
+    this.mesh = mesh;
   }
 
   addLinkedPoint(int) {

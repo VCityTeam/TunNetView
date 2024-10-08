@@ -344,7 +344,7 @@ loadMultipleJSON([
       sphere.position.set(value.x, value.y, value.z);
       sphere.position.add(offset);
       app.itownsView.scene.add(sphere);
-      value.sphereMesh = sphere;
+      value.bindMesh(sphere);
       app.itownsView.notifyChange();
     });
 
