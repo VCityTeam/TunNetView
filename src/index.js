@@ -10,7 +10,6 @@ import { loadCavePath } from './LoadCavePath';
 import { Visualizer } from './Visualizer';
 import { CameraController } from './CameraController';
 import { buildPoint, findStart } from './Point';
-import { VisualizerDeconstruct } from './VisualizerDeconstruct';
 
 // The PointCloudVisualizer widget stores the current camera position within
 // the local storage so that the rendering remains unchanged on scene reload.
@@ -51,7 +50,7 @@ loadMultipleJSON([
 
   ///// Eventually, create the PointCloudVisualizer "application" with all
   // the above parameters.
-  const app = new VisualizerDeconstruct(extent, layersConfigs, {
+  const app = new Visualizer(extent, layersConfigs, {
     parentDomElement: document.body,
     domElementClass: 'full_screen',
     defaultPointCloudSize: DEFAULT_POINT_SIZE,

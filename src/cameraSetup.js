@@ -5,7 +5,7 @@ import {
 import { C3DTILES_LAYER_EVENTS } from 'itowns';
 import { Vector3 } from 'three';
 
-import { VisualizerDeconstruct } from './VisualizerDeconstruct';
+import { Visualizer } from './Visualizer';
 
 export function setUpCameraDefaults(
   itownsView,
@@ -17,7 +17,7 @@ export function setUpCameraDefaults(
   if (
     !localStorageSetMatrix4(
       camera3D.matrixWorld,
-      VisualizerDeconstruct.CAMERA_LOCAL_STORAGE_KEY
+      Visualizer.CAMERA_LOCAL_STORAGE_KEY
     )
   ) {
     if (options.camera && options.camera.default)
@@ -38,7 +38,7 @@ export function setUpCameraDefaults(
   if (
     !localStorageSetVector3(
       orbitControls.target,
-      VisualizerDeconstruct.TARGET_LOCAL_STORAGE_KEY
+      Visualizer.TARGET_LOCAL_STORAGE_KEY
     )
   ) {
     const listener = (layer) => {
