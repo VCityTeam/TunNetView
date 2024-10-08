@@ -1,4 +1,4 @@
-import { Camera, Mesh, SphereGeometry, MeshBasicMaterial } from 'three';
+import { Mesh, MeshBasicMaterial, BoxGeometry } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { RequestAnimationFrameProcess } from '@ud-viz/utils_browser';
 
@@ -12,7 +12,7 @@ export class TargetOrbitControlMesh {
 
     /** @type {Mesh} */
     this.mesh = new Mesh(
-      new SphereGeometry(),
+      new BoxGeometry(),
       new MeshBasicMaterial({ color: 'red' })
     );
 

@@ -81,7 +81,7 @@ export class CameraController {
             if (point == this.focusPoint) {
               point.mesh.material.color.set(0x00ff00);
             } else {
-              point.mesh.material.color.set(0xff0000);
+              point.mesh.material.color.set(0x0000ff);
             }
           });
           resolve();
