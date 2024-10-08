@@ -1,4 +1,4 @@
-import { colorSpace, loadMultipleJSON } from '@ud-viz/utils_browser';
+import { loadMultipleJSON } from '@ud-viz/utils_browser';
 import * as proj4 from 'proj4';
 import { LayerChoice } from '@ud-viz/widget_layer_choice';
 import { C3DTiles } from '@ud-viz/widget_3d_tiles';
@@ -213,12 +213,22 @@ loadMultipleJSON([
     });
   };
 
+  const planarLayer = app.itownsView
+    .getLayers()
+    .filter((el) => el.id == 'planar')[0];
+  console.log(planarLayer);
+
+  app.itownsView.addEventListener(itowns.VIEW_EVENTS.LAYERS_INITIALIZED, () => {
+    planarLayer.object3d.traverse((child) => {
+      if (child.material) {
+        child.material.side = THREE.DoubleSide;
+      }
+    });
+  });
+
   const loaderCavePath = async () => {
     const offset = await syntheticCavesLoaded();
-    // console.log(offset);
     const object = await loadCavePath(app.itownsView.scene);
-    // console.log(object);
-    // const offset = new THREE.Vector3(1841729.466334, 5175204.02523159, 260.177757835388);
     if (!offset.equals(new THREE.Vector3(0, 0, 0))) {
       object.position.add(offset);
     }
@@ -347,9 +357,6 @@ loadMultipleJSON([
       value.bindMesh(sphere);
       app.itownsView.notifyChange();
     });
-
-    app.viewManager.orbitControls.enabled = false;
-    app.targetOrbitControlsMesh.mesh.visible = false;
 
     const camera = new CameraController(
       startPoint,
