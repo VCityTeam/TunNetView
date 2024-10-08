@@ -18,7 +18,6 @@ export class CameraController {
     this.camera.fov = 90;
     this.offset = offset; // georeferenced position of layer
 
-    console.log(this.currentPoint);
     this.camera.position.set(
       this.currentPoint.getX(),
       this.currentPoint.getY(),
@@ -119,7 +118,6 @@ export class CameraController {
         if (alpha < 1) {
           requestAnimationFrame(updateCounter);
         } else {
-          console.log('Position camera', element.position);
           this.currentPoint.linkedPoint.forEach((iNeighbourPoint) => {
             const point = this.mapPoint.get(iNeighbourPoint);
             point.mesh.material.color.set(0xffff00);
@@ -202,7 +200,6 @@ export class CameraController {
                 break;
               }
             }
-            console.log(this.focusPoint);
             break;
 
           case 'ArrowRight':
@@ -222,7 +219,6 @@ export class CameraController {
                 break;
               }
             }
-            console.log(this.focusPoint);
             break;
 
           case 'KeyS':

@@ -202,7 +202,6 @@ loadMultipleJSON([
           layer.addEventListener(
             itowns.C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED,
             (layerLoaded) => {
-              // console.log(layerLoaded);
               const offset = layerLoaded.tileContent.position.clone();
               resolve(offset);
             }
@@ -215,7 +214,6 @@ loadMultipleJSON([
   const planarLayer = app.itownsView
     .getLayers()
     .filter((el) => el.id == 'planar')[0];
-  console.log(planarLayer);
 
   app.itownsView.addEventListener(itowns.VIEW_EVENTS.LAYERS_INITIALIZED, () => {
     planarLayer.object3d.traverse((child) => {

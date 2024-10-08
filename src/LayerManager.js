@@ -60,7 +60,6 @@ export class LayerManager {
       ({ tileContent }) => {
         let typePoint = false;
         tileContent.traverse((m) => {
-          console.log(m.type);
           if (m.type == 'Points') {
             typePoint = true;
           }
