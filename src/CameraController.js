@@ -79,9 +79,9 @@ export class CameraController {
           this.currentPoint.linkedPoint.forEach((iNeighbourPoint) => {
             const point = this.mapPoint.get(iNeighbourPoint);
             if (point == this.focusPoint) {
-              point.sphereMesh.material.color.set(0x00ff00);
+              point.mesh.material.color.set(0x00ff00);
             } else {
-              point.sphereMesh.material.color.set(0xff0000);
+              point.mesh.material.color.set(0xff0000);
             }
           });
           resolve();
@@ -122,7 +122,7 @@ export class CameraController {
           console.log('Position camera', element.position);
           this.currentPoint.linkedPoint.forEach((iNeighbourPoint) => {
             const point = this.mapPoint.get(iNeighbourPoint);
-            point.sphereMesh.material.color.set(0xffff00);
+            point.mesh.material.color.set(0xffff00);
           });
           this.cameraIsMoving = false;
           resolve();
