@@ -33,7 +33,10 @@
     "@ud-viz/widget_3d_tiles": "4.3.0",
     "@ud-viz/widget_bookmark": "4.3.0",
     "@ud-viz/widget_layer_choice": "4.3.0",
-    "buffer": "^6.0.3"
+    "buffer": "^6.0.3",
+    "cross-env": "7.0.3",
+    "express": "4.19.2",
+    "string-replace-middleware": "1.0.2"
   },
   "devDependencies": {
     "css-loader": "^6.8.1",
