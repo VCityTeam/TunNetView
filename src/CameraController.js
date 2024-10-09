@@ -92,10 +92,6 @@ export class CameraController {
     });
   }
 
-  move() {
-    this.camera.position.add(new Vector3(1.5, -1.5, 0));
-  }
-
   moveCamera(startPoint, endPoint, element, offset, duration = 500) {
     this.cameraIsMoving = true;
     return new Promise((resolve) => {
@@ -149,10 +145,6 @@ export class CameraController {
 
         const linkedPoint = this.currentPoint.getLinkedPoint();
         switch (event.code) {
-          case 'Space':
-            this.move(); //DEBUG Function
-            break;
-
           case 'ArrowUp':
             if (this.cameraIsMoving) return;
             this.moveCamera(
@@ -165,22 +157,6 @@ export class CameraController {
               this.currentPoint = this.focusPoint;
               this.setFocus(this.oldPoint);
             });
-            break;
-
-          case 'ArrowDown':
-            if (!this.oldPoint) {
-              console.warn('NO OLD POINT REGISTER PLEASE USE ARROW UP BEFORE');
-              return;
-            }
-            this.moveCamera(
-              this.currentPoint,
-              this.oldPoint,
-              this.camera,
-              this.offset
-            );
-            this.oldPoint = this.currentPoint;
-            this.currentPoint = this.oldPoint;
-            this.setFocus(this.oldPoint);
             break;
 
           case 'ArrowLeft':
@@ -219,26 +195,6 @@ export class CameraController {
                 break;
               }
             }
-            break;
-
-          case 'KeyS':
-            console.log('S');
-            this.camera.position.add(new Vector3(-1, 1, 0));
-            break;
-
-          case 'KeyD':
-            console.log('D');
-            this.camera.position.add(new Vector3(-1, -1, 0));
-            break;
-
-          case 'KeyW':
-            console.log('Z');
-            this.camera.position.add(new Vector3(1, -1, 0));
-            break;
-
-          case 'KeyA':
-            console.log('Q');
-            this.camera.position.add(new Vector3(1, 1, 0));
             break;
 
           default:
