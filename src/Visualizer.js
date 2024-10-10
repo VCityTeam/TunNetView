@@ -87,7 +87,7 @@ export class Visualizer {
       this.viewManager.itownsView,
       this.viewManager.orbitControls,
       this.layerManager.layers,
-      options
+      options.camera
     );
 
     this.c3DTilesLoadingDomElement = setupLoadingUI(

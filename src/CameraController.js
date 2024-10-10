@@ -1,23 +1,43 @@
 import { Camera, Vector3, Euler, MathUtils } from 'three';
 import { Point } from './Point';
-// Utiliser les fonctions importées
 
+/**
+ * @classdesc representing a camera controller for navigating a 3D scene.
+ */
 export class CameraController {
   /**
-   * @param {Point} startPoint leaf of skeleton graph
-   * @param {PlanarView} itownsView
    *
+   * @param {Point} startPoint - initial point in the skeleton graph.
+   * @param {Map<string, Point>} mapPoint - all points in the graph.
+   * @param {PlanarView} itownsView - iTowns view.
+   * @param {Vector3} offset - georeferenced position offset of the layer.
    */
   constructor(startPoint, mapPoint, itownsView, offset) {
+    /** @type {Point} current point where the camera is located */
     this.currentPoint = startPoint;
-    this.focusPoint = null;
-    this.oldPoint = null;
-    this.mapPoint = mapPoint;
-    this.itownsView = itownsView;
-    this.camera = itownsView.camera.camera3D;
-    this.camera.fov = 90;
-    this.offset = offset; // georeferenced position of layer
 
+    /** @type {Point|null}*/
+    this.focusPoint = null;
+
+    /** @type {Point|null}*/
+    this.previousPoint = null;
+
+    /** @type {Map<string, Point>}*/
+    this.mapPoint = mapPoint;
+
+    /** @type {PlanarView}*/
+    this.itownsView = itownsView;
+
+    /** @type {Camera} */
+    this.camera = itownsView.camera.camera3D;
+
+    // Set the field of view to 90 degrees
+    this.camera.fov = 90;
+
+    /** @type {Vector3} georeferenced position offset of the layer */
+    this.offset = offset;
+
+    // Set initial camera position
     this.camera.position.set(
       this.currentPoint.getX(),
       this.currentPoint.getY(),
@@ -25,19 +45,26 @@ export class CameraController {
     );
     this.camera.position.add(offset);
 
+    /** @type {boolean} Flag if the camera is moving */
     this.cameraIsMoving = false;
+
     this.setFocus();
     this.addListener();
   }
 
-  setFocus(oldPoint) {
+  /**
+   * Set the focus point for the camera.
+   * @param {Point} [previousPoint] - previous focus point.
+   * @returns {Promise} A promise that resolves when the camera has finished looking at the new focus point.
+   */
+  setFocus(previousPoint) {
     if (
       this.currentPoint &&
       this.currentPoint.linkedPoint &&
       this.currentPoint.linkedPoint.length > 0
     ) {
       if (
-        this.mapPoint.get(this.currentPoint.linkedPoint[0]) !== oldPoint ||
+        this.mapPoint.get(this.currentPoint.linkedPoint[0]) !== previousPoint ||
         this.currentPoint.linkedPoint.length <= 1
       ) {
         this.focusPoint = this.mapPoint.get(this.currentPoint.linkedPoint[0]);
@@ -51,6 +78,12 @@ export class CameraController {
     return this.lookPoint(this.focusPoint);
   }
 
+  /**
+   * Make the camera look at a specific point.
+   * @param {Point} point - The point to look at.
+   * @param {number} [speedRotation=0.25] - The speed of the camera rotation.
+   * @returns {Promise} A promise that resolves when the camera has finished rotating.
+   */
   lookPoint(point, speedRotation = 0.25) {
     if (!point) return;
     this.cameraIsMoving = true;
@@ -75,14 +108,7 @@ export class CameraController {
           requestAnimationFrame(updateCounter);
         } else {
           this.cameraIsMoving = false;
-          this.currentPoint.linkedPoint.forEach((iNeighbourPoint) => {
-            const point = this.mapPoint.get(iNeighbourPoint);
-            if (point == this.focusPoint) {
-              point.mesh.material.color.set(0x00ff00);
-            } else {
-              point.mesh.material.color.set(0x0000ff);
-            }
-          });
+          this.updatePointColors(0x0000ff);
           resolve();
         }
         this.itownsView.notifyChange();
@@ -92,6 +118,15 @@ export class CameraController {
     });
   }
 
+  /**
+   * Move the camera from one point to another.
+   * @param {Point} startPoint - The starting point.
+   * @param {Point} endPoint - The ending point.
+   * @param {Object3D} element - The element to move (usually the camera).
+   * @param {Vector3} offset - The offset to apply to the movement.
+   * @param {number} [duration=500] - The duration of the movement in milliseconds.
+   * @returns {Promise} A promise that resolves when the camera has finished moving.
+   */
   moveCamera(startPoint, endPoint, element, offset, duration = 500) {
     this.cameraIsMoving = true;
     return new Promise((resolve) => {
@@ -114,10 +149,7 @@ export class CameraController {
         if (alpha < 1) {
           requestAnimationFrame(updateCounter);
         } else {
-          this.currentPoint.linkedPoint.forEach((iNeighbourPoint) => {
-            const point = this.mapPoint.get(iNeighbourPoint);
-            point.mesh.material.color.set(0xffff00);
-          });
+          this.updatePointColors(0xffff00);
           this.cameraIsMoving = false;
           resolve();
         }
@@ -134,76 +166,99 @@ export class CameraController {
     });
   }
 
+  /**
+   * Add keyboard event listeners for camera control.
+   */
   addListener() {
-    // Ajout de l'écouteur d'événements pour les touches
     window.addEventListener(
       'keydown',
       (event) => {
         if (event.defaultPrevented) {
-          return; // Ne devrait rien faire si l'événement de la touche était déjà consommé.
+          return;
         }
 
         const linkedPoint = this.currentPoint.getLinkedPoint();
         switch (event.code) {
           case 'ArrowUp':
-            if (this.cameraIsMoving) return;
-            this.moveCamera(
-              this.currentPoint,
-              this.focusPoint,
-              this.camera,
-              this.offset
-            ).then(() => {
-              this.oldPoint = this.currentPoint;
-              this.currentPoint = this.focusPoint;
-              this.setFocus(this.oldPoint);
-            });
+            this.handleArrowUp();
             break;
-
           case 'ArrowLeft':
-            if (this.cameraIsMoving) return;
-            for (let i = 0; i < linkedPoint.length; i++) {
-              let x = null;
-              if (this.mapPoint.get(linkedPoint[i]) === this.focusPoint) {
-                if (i - 1 < 0) {
-                  x = linkedPoint.length - 1;
-                } else {
-                  x = i - 1;
-                }
-                if (x !== null) {
-                  this.focusPoint = this.mapPoint.get(linkedPoint[x]);
-                  this.lookPoint(this.focusPoint);
-                }
-                break;
-              }
-            }
+            this.handleArrowLeft(linkedPoint);
             break;
-
           case 'ArrowRight':
-            if (this.cameraIsMoving) return;
-            for (let i = 0; i < linkedPoint.length; i++) {
-              let x = null;
-              if (this.mapPoint.get(linkedPoint[i]) === this.focusPoint) {
-                if (i + 1 === linkedPoint.length) {
-                  x = 0;
-                } else {
-                  x = i + 1;
-                }
-                if (x !== null) {
-                  this.focusPoint = this.mapPoint.get(linkedPoint[x]);
-                  this.lookPoint(this.focusPoint);
-                }
-                break;
-              }
-            }
+            this.handleArrowRight(linkedPoint);
             break;
-
           default:
-            return; // Quitter lorsque cela ne gère pas l'événement touche.
+            return;
         }
 
         event.preventDefault();
       },
       true
     );
+  }
+
+  /**
+   * Handle the 'ArrowUp' key press event.
+   */
+  handleArrowUp() {
+    if (this.cameraIsMoving) return;
+    this.moveCamera(
+      this.currentPoint,
+      this.focusPoint,
+      this.camera,
+      this.offset
+    ).then(() => {
+      this.previousPoint = this.currentPoint;
+      this.currentPoint = this.focusPoint;
+      this.setFocus(this.previousPoint);
+    });
+  }
+
+  /**
+   * Handle the 'ArrowLeft' key press event.
+   * @param {Array<Point>} linkedPoint - Array of linked points.
+   */
+  handleArrowLeft(linkedPoint) {
+    if (this.cameraIsMoving) return;
+    this.rotateFocus(linkedPoint, -1);
+  }
+
+  /**
+   * Handle the 'ArrowRight' key press event.
+   * @param {Array<Point>} linkedPoint - Array of linked points.
+   */
+  handleArrowRight(linkedPoint) {
+    if (this.cameraIsMoving) return;
+    this.rotateFocus(linkedPoint, 1);
+  }
+
+  /**
+   * Rotate the focus point.
+   * @param {Array<Point>} linkedPoint - Array of linked points.
+   * @param {number} direction - Direction of rotation (-1 for left, 1 for right).
+   */
+  rotateFocus(linkedPoint, direction) {
+    for (let i = 0; i < linkedPoint.length; i++) {
+      if (this.mapPoint.get(linkedPoint[i]) === this.focusPoint) {
+        let x = (i + direction + linkedPoint.length) % linkedPoint.length;
+        this.focusPoint = this.mapPoint.get(linkedPoint[x]);
+        this.lookPoint(this.focusPoint);
+        break;
+      }
+    }
+  }
+
+  /**
+   * Update the colors of the linked points.
+   * @param {number} [defaultColor=0xffff00] - The default color for non-focus points.
+   */
+  updatePointColors(defaultColor = 0xffff00) {
+    this.currentPoint.linkedPoint.forEach((iNeighbourPoint) => {
+      const point = this.mapPoint.get(iNeighbourPoint);
+      point.mesh.material.color.set(
+        point === this.focusPoint ? 0x00ff00 : defaultColor
+      );
+    });
   }
 }
