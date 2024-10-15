@@ -345,7 +345,10 @@ loadMultipleJSON([
     const offset = await syntheticCavesLoaded();
     mapPoint.forEach((value, key, map) => {
       const geometry = new THREE.SphereGeometry(1, 32, 16);
-      const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+      const material = new THREE.MeshBasicMaterial({
+        color: 0xffff00,
+        transparent: true,
+      });
       const sphere = new THREE.Mesh(geometry, material);
       sphere.scale.set(0.025, 0.025, 0.025);
       sphere.position.set(value.x, value.y, value.z);

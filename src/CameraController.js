@@ -203,12 +203,14 @@ export class CameraController {
    */
   handleArrowUp() {
     if (this.cameraIsMoving) return;
+    this.focusPoint.mesh.material.opacity = 0.1;
     this.moveCamera(
       this.currentPoint,
       this.focusPoint,
       this.camera,
       this.offset
     ).then(() => {
+      this.focusPoint.mesh.material.opacity = 1;
       this.previousPoint = this.currentPoint;
       this.currentPoint = this.focusPoint;
       this.setFocus(this.previousPoint);
