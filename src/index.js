@@ -15,7 +15,7 @@ import { buildPoint, findStart } from './Point';
 // the local storage so that the rendering remains unchanged on scene reload.
 // Inhibit this feature for the time being.
 localStorage.clear();
-
+const GLOBAL_OFFSET = new THREE.Vector3(1841790.636546, 5175201.482763, 200);
 loadMultipleJSON([
   './assets/config/extents.json',
   './assets/config/crs.json',
@@ -195,22 +195,6 @@ loadMultipleJSON([
   uiLayerChoiceDomElement.classList.add('full_screen');
   uiDomElement.appendChild(uiLayerChoiceDomElement);
 
-  const syntheticCavesLoaded = () => {
-    return new Promise((resolve) => {
-      app.layers.forEach((layer) => {
-        if (layer.name === 'Synthetic_caves') {
-          layer.addEventListener(
-            itowns.C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED,
-            (layerLoaded) => {
-              const offset = layerLoaded.tileContent.position.clone();
-              resolve(offset);
-            }
-          );
-        }
-      });
-    });
-  };
-
   const planarLayer = app.itownsView
     .getLayers()
     .filter((el) => el.id == 'planar')[0];
@@ -224,7 +208,7 @@ loadMultipleJSON([
   });
 
   const loaderCavePath = async () => {
-    const offset = await syntheticCavesLoaded();
+    const offset = GLOBAL_OFFSET;
     const object = await loadCavePath(app.itownsView.scene);
     if (!offset.equals(new THREE.Vector3(0, 0, 0))) {
       object.position.add(offset);
@@ -342,7 +326,7 @@ loadMultipleJSON([
 
     // const startPoint = new Point(0, 0, 0);
 
-    const offset = await syntheticCavesLoaded();
+    const offset = GLOBAL_OFFSET;
     mapPoint.forEach((value, key, map) => {
       const geometry = new THREE.SphereGeometry(1, 32, 16);
       const material = new THREE.MeshBasicMaterial({
