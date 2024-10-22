@@ -78,20 +78,18 @@ export class LayerManager {
         }
       }
     );
-
     c3dTilesLayer.addEventListener(
       C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED,
-      (layer) => {
-        const newBB = layer.tileContent.boundingVolume.box.clone();
-        const target = layer.tileContent
-          .getWorldPosition(new Vector3())
-          .clone();
-        newBB.translate(target);
-        this.globalBB.union(newBB);
-
-        this.globalBBMesh.position.copy(this.globalBB.getCenter(new Vector3()));
+      () => {
+        let notAMesh = true;
+        c3dTilesLayer.object3d.traverse((child) => {
+          if (child.isMesh) notAMesh = false;
+        });
+        if (notAMesh) return;
+        this.globalBB.expandByObject(c3dTilesLayer.object3d);
+        this.globalBB.getCenter(this.globalBBMesh.position);
         this.globalBBMesh.scale.copy(
-          this.globalBB.max.clone().sub(this.globalBB.min.clone())
+          this.globalBB.max.clone().sub(this.globalBB.min)
         );
         this.globalBBMesh.updateMatrixWorld();
       }

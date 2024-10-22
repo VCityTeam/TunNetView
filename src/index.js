@@ -10,6 +10,7 @@ import { loadCavePath } from './LoadCavePath';
 import { Visualizer } from './Visualizer';
 import { CameraController } from './CameraController';
 import { buildPoint, findStart } from './Point';
+import { Box3 } from 'three';
 
 // The PointCloudVisualizer widget stores the current camera position within
 // the local storage so that the rendering remains unchanged on scene reload.
@@ -217,12 +218,8 @@ loadMultipleJSON([
   loaderCavePath();
 
   layerChoice.addEventListener(LayerChoice.EVENT.FOCUS_3D_TILES, (data) => {
-    const bb = data.message.layerFocused.root.boundingVolume.box;
-    const center = bb.getCenter(new THREE.Vector3());
-    const target = data.message.layerFocused.root.position // position du target mesh (sphere rouge)
-      .clone()
-      .add(center.clone());
-    app.orbitControls.target.copy(target);
+    const bb = new Box3().setFromObject(data.message.layerFocused.root);
+    bb.getCenter(app.orbitControls.target);
     app.orbitControls.update();
   });
 
