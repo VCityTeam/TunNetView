@@ -3,11 +3,11 @@ import * as proj4 from 'proj4';
 import { LayerChoice } from '@ud-viz/widget_layer_choice';
 import { C3DTiles } from '@ud-viz/widget_3d_tiles';
 import { initScene } from '@ud-viz/utils_browser';
+import { Visualizer } from '@ud-viz/visualizer';
 import * as itowns from 'itowns';
 import * as THREE from 'three';
 
 import { loadCavePath } from './LoadCavePath';
-import { Visualizer } from './Visualizer';
 import { CameraController } from './CameraController';
 import { buildPoint, findStart } from './Point';
 import { Box3 } from 'three';
@@ -28,7 +28,7 @@ loadMultipleJSON([
   proj4.default.defs(configs['crs'][0].name, configs['crs'][0].transform);
 
   /////////////////////////////////////////////////////////////////////////
-  // The application is build on top of the PointCloudVisualizer() class
+  // The application is build on top of the Visualizer() class
 
   // Default size at which any point of the point cloud shall be rendered.
   // This should not be a constant but it should depend on the point cloud
