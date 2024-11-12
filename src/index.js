@@ -1,7 +1,10 @@
 import * as proj4 from 'proj4';
 import * as itowns from 'itowns';
 import * as THREE from 'three';
-import { loadMultipleJSON } from '@ud-viz/utils_browser';
+import {
+  loadMultipleJSON,
+  RequestAnimationFrameProcess,
+} from '@ud-viz/utils_browser';
 import { LayerChoice } from '@ud-viz/widget_layer_choice';
 import { C3DTiles } from '@ud-viz/widget_3d_tiles';
 import { initScene } from '@ud-viz/utils_browser';
@@ -158,6 +161,14 @@ initScene(
   app.itownsView.scene
 );
 
+const initLayerPromise = new Promise((resolve) => {
+  app.itownsView.addEventListener(itowns.VIEW_EVENTS.LAYERS_INITIALIZED, () => {
+    resolve();
+  });
+});
+
+await loadingScreen(['TUNNETVIEW'], initLayerPromise);
+
 /////////////////////////////////////////////////////////////////////////
 // Build the ui (with the help of widgets)
 const ui = document.createElement('div');
@@ -209,27 +220,25 @@ const c3dTLBuildings = app.itownsView
   .getLayers()
   .filter((el) => el.isC3DTilesLayer && el.id == 'Buildings');
 
-app.itownsView.addEventListener(itowns.VIEW_EVENTS.LAYERS_INITIALIZED, () => {
-  planarLayer.object3d.traverse((child) => {
-    if (child.material) {
-      child.material.side = THREE.DoubleSide;
-    }
-  });
+planarLayer.object3d.traverse((child) => {
+  if (child.material) {
+    child.material.side = THREE.DoubleSide;
+  }
+});
 
-  /*USE   app.itownsView.addEventListener(itowns.MAIN_LOOP_EVENTS.AFTER_CAMERA_UPDATE,()=>{}); if you enable itowns controls*/
-  app.orbitControls.addEventListener('change', () => {
-    if (isCameraUnderPlanar(app.itownsView.camera3D, planarLayer, extent.crs)) {
-      planarLayer.opacity = 0.2;
-      c3dTLBuildings.forEach((layer) => {
-        layer.opacity = 0;
-      });
-    } else {
-      planarLayer.opacity = 1;
-      c3dTLBuildings.forEach((layer) => {
-        layer.opacity = 1;
-      });
-    }
-  });
+/*USE   app.itownsView.addEventListener(itowns.MAIN_LOOP_EVENTS.AFTER_CAMERA_UPDATE,()=>{}); if you enable itowns controls*/
+app.itownsView.camera3D.addEventListener('change', () => {
+  if (isCameraUnderPlanar(app.itownsView.camera3D, planarLayer, extent.crs)) {
+    planarLayer.opacity = 0.2;
+    c3dTLBuildings.forEach((layer) => {
+      layer.opacity = 0;
+    });
+  } else {
+    planarLayer.opacity = 1;
+    c3dTLBuildings.forEach((layer) => {
+      layer.opacity = 1;
+    });
+  }
 });
 
 const loaderCavePath = async () => {
@@ -275,9 +284,20 @@ const camera = new CameraController(
   offset
 );
 
-// eslint-disable-next-line no-constant-condition
-if ('RUN_MODE' == 'production')
-  loadingScreen(app.itownsView, ['UD-VIZ', 'UDVIZ_VERSION']);
+camera.setFocus();
+camera.addListener();
+
+const cameraProcess = new RequestAnimationFrameProcess(30);
+let cameraMatrixWorldPreviousFrame =
+  app.itownsView.camera3D.matrixWorld.clone();
+cameraProcess.start(() => {
+  if (
+    !app.itownsView.camera3D.matrixWorld.equals(cameraMatrixWorldPreviousFrame)
+  ) {
+    app.itownsView.camera3D.dispatchEvent({ type: 'change' });
+    app.itownsView.camera3D = app.itownsView.camera3D.matrixWorld.clone();
+  }
+});
 
 window.addEventListener('keydown', (event) => {
   if (event.key == 'p') console.log(app);
