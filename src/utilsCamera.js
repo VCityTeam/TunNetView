@@ -81,8 +81,8 @@ export function isCameraInsideZoneOfInterest(app) {
   const rootTileBox = rootTile.boundingVolume.box;
   const boxMin = rootTileBox.min.clone();
   const boxMax = rootTileBox.max.clone();
-  const boxCenter = boxMin.add(boxMax).multiplyScalar(1 / 2);
-  boxCenter.add(rootTilePosition);
+  let boxCenter = boxMin.add(boxMax).multiplyScalar(1 / 2);
+  boxCenter = boxCenter.add(rootTilePosition);
 
   // Define some notion of the size/dimensions of the bounding box of the
   // tileset:
