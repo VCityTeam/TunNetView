@@ -1,4 +1,4 @@
-import { Camera, Vector3, Euler, MathUtils } from 'three';
+import { Camera, Vector3, MathUtils } from 'three';
 import { Point } from './Point';
 
 /**
@@ -47,9 +47,6 @@ export class CameraController {
 
     /** @type {boolean} Flag if the camera is moving */
     this.cameraIsMoving = false;
-
-    this.setFocus();
-    this.addListener();
   }
 
   /**
