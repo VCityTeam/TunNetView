@@ -295,7 +295,8 @@ cameraProcess.start(() => {
     !app.itownsView.camera3D.matrixWorld.equals(cameraMatrixWorldPreviousFrame)
   ) {
     app.itownsView.camera3D.dispatchEvent({ type: 'change' });
-    app.itownsView.camera3D = app.itownsView.camera3D.matrixWorld.clone();
+    cameraMatrixWorldPreviousFrame =
+      app.itownsView.camera3D.matrixWorld.clone();
   }
 });
 

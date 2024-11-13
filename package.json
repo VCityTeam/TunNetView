@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -f -r node_modules dist && rm -f package-lock.json",
+    "reset": "npm run clean && npm i",
     "build": "webpack --config webpack.config.js",
-    "watch-build": "nodemon -s sigterm --watch src -e js --exec 'npm run build'",
+    "watch-build": "nodemon -s sigterm --watch src -e js --exec 'cross-env MODE=development npm run build'",
     "start": "node ./bin/backEnd.js",
     "start-test": "cross-env PORT=8099 SYNTHETIC_CAVE_URL='https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_1_grid_size_x_1_grid_size_y_1_point_cloud-3dtiles/tileset-translated-to-lyon-cathedral.json' node ./bin/backEnd.js"
   },
@@ -28,17 +29,18 @@
   },
   "homepage": "https://github.com/VCityTeam/TunNetView#readme",
   "dependencies": {
-    "@ud-viz/visualizer": "4.5.1",
     "@ud-viz/utils_browser": "4.5.1",
+    "@ud-viz/visualizer": "4.5.1",
     "@ud-viz/widget_3d_tiles": "4.5.1",
     "@ud-viz/widget_bookmark": "4.5.1",
     "@ud-viz/widget_layer_choice": "4.5.1",
     "buffer": "6.0.3",
-    "cross-env": "7.0.3",
     "express": "4.19.2",
     "string-replace-middleware": "1.0.2"
   },
   "devDependencies": {
+    "child-process-promise": "2.2.1",
+    "cross-env": "^7.0.3",
     "css-loader": "^6.8.1",
     "nodemon": "^3.1.2",
     "style-loader": "^3.3.3",

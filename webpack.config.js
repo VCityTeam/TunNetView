@@ -1,12 +1,14 @@
 const path = require('path');
 
-module.exports = {
-  mode: 'development',
-  devtool: 'source-map',
-  entry: './src/index.js',
+const MODE = process.env.MODE || 'production';
+console.log(MODE);
+
+const webpackConfig = {
+  entry: `./src/index.js`,
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    publicPath: `./public`,
+    path: path.resolve(__dirname, `./public/dist`),
   },
   module: {
     rules: [
@@ -16,7 +18,10 @@ module.exports = {
       },
     ],
   },
-  resolve: {
-    modules: ['../UD-Viz/node_modules', './node_modules'],
-  },
+  resolve: { modules: ['./node_modules'] },
 };
+
+webpackConfig.mode = MODE;
+webpackConfig.devtool = MODE == 'development' ? 'source-map' : undefined;
+
+module.exports = webpackConfig;
