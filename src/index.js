@@ -277,15 +277,15 @@ mapPoint.forEach((value, key, map) => {
   app.itownsView.notifyChange();
 });
 
-const camera = new CameraController(
-  startPoint,
-  mapPoint,
-  app.itownsView,
-  offset
-);
+// const camera = new CameraController(
+//   startPoint,
+//   mapPoint,
+//   app.itownsView,
+//   offset
+// );
 
-camera.setFocus();
-camera.addListener();
+// camera.setFocus();
+// camera.addListener();
 
 const cameraProcess = new RequestAnimationFrameProcess(30);
 let cameraMatrixWorldPreviousFrame =
