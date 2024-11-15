@@ -7,7 +7,7 @@ export function loadCavePath(scene) {
     // load a resource
     loader.load(
       // resource URL
-      '../model/skel.obj',
+      '../assets/model/skeleton.obj',
       // called when resource is loaded
       function (object) {
         scene.add(object);

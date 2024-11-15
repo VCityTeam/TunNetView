@@ -11,6 +11,7 @@ import { initScene } from '@ud-viz/utils_browser';
 import { Visualizer } from '@ud-viz/visualizer';
 
 import { loadCavePath } from './LoadCavePath';
+import { RailControls } from './RailControls';
 import { CameraController } from './CameraController';
 import { buildPoint, findStart } from './Point';
 import { isCameraUnderPlanar } from './utilsCamera';
@@ -262,7 +263,7 @@ const mapPoint = buildPoint(configs['point']);
 const startPoint = findStart(mapPoint);
 
 const offset = GLOBAL_OFFSET;
-mapPoint.forEach((value, key, map) => {
+mapPoint.forEach((value) => {
   const geometry = new THREE.SphereGeometry(1, 32, 16);
   const material = new THREE.MeshBasicMaterial({
     color: 0xffff00,
@@ -277,15 +278,30 @@ mapPoint.forEach((value, key, map) => {
   app.itownsView.notifyChange();
 });
 
-// const camera = new CameraController(
-//   startPoint,
-//   mapPoint,
-//   app.itownsView,
-//   offset
-// );
+const railControls = new RailControls(
+  startPoint,
+  mapPoint,
+  app.itownsView,
+  offset
+);
+railControls.addListener();
+app.orbitControls.update();
 
-// camera.setFocus();
-// camera.addListener();
+const mapControls = new Map();
+mapControls.set(CameraController.CONTROLS.ORBIT_CONTROLS, app.orbitControls);
+mapControls.set(CameraController.CONTROLS.RAIL_CONTROLS, railControls);
+
+const cameraController = new CameraController(mapControls);
+cameraController.switchControls(CameraController.CONTROLS.ORBIT_CONTROLS);
+
+window.addEventListener('keydown', (event) => {
+  if (event.key == 'ArrowUp') {
+    cameraController.switchControls(CameraController.CONTROLS.RAIL_CONTROLS);
+  }
+  if (event.key.toLocaleLowerCase() == 'o') {
+    cameraController.switchControls(CameraController.CONTROLS.ORBIT_CONTROLS);
+  }
+});
 
 const cameraProcess = new RequestAnimationFrameProcess(30);
 let cameraMatrixWorldPreviousFrame =
