@@ -13,8 +13,6 @@ export class CameraController {
 
     /**@type {Controls} */
     this.currentControls = null;
-
-    console.log(mapControls);
   }
 
   disableControls() {
@@ -22,6 +20,7 @@ export class CameraController {
       controls.enabled = false;
     });
   }
+
   switchControls(controlsMode) {
     this.disableControls();
     this.currentControls = this.mapControls.get(controlsMode);

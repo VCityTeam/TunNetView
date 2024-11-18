@@ -295,23 +295,66 @@ flyControls.start();
 const mapControls = new Map();
 mapControls.set(CameraController.CONTROLS.ORBIT_CONTROLS, app.orbitControls);
 mapControls.set(CameraController.CONTROLS.RAIL_CONTROLS, railControls);
-
 mapControls.set(CameraController.CONTROLS.FLY_CONTROLS, flyControls);
 
 const cameraController = new CameraController(mapControls);
 cameraController.disableControls();
 
+const divCameraController = document.createElement('div');
+divCameraController.id = 'div_camera_controller';
+const labelChangeMode = document.createElement('label');
+
+labelChangeMode.innerText = 'Change Mode:';
+const listMode = document.createElement('ul');
+
+const liModeOrbitsControls = document.createElement('li');
+liModeOrbitsControls.innerText =
+  'o: ' + CameraController.CONTROLS.ORBIT_CONTROLS;
+listMode.appendChild(liModeOrbitsControls);
+
+const liModeFlyControls = document.createElement('li');
+liModeFlyControls.innerText = 'f: ' + CameraController.CONTROLS.FLY_CONTROLS;
+listMode.appendChild(liModeFlyControls);
+
+const liModeRailControls = document.createElement('li');
+liModeRailControls.innerText = 'r: ' + CameraController.CONTROLS.RAIL_CONTROLS;
+listMode.appendChild(liModeRailControls);
+
+const pBinds = document.createElement('p');
+divCameraController.appendChild(pBinds);
+
+uiDomElement.appendChild(divCameraController);
+
 cameraController.switchControls(CameraController.CONTROLS.FLY_CONTROLS);
+pBinds.innerText = `Current Mode:  ${CameraController.CONTROLS.FLY_CONTROLS}
+- ArrowUp: Move forward
+- ArrowDown: Move backward
+- ArrowLeft: Move side to left
+- ArrowRight: Move side to right
+- MouseMove = Rotate camera
+`;
 
 window.addEventListener('keydown', (event) => {
   if (event.key == 'r') {
     cameraController.switchControls(CameraController.CONTROLS.RAIL_CONTROLS);
+    pBinds.innerText = `Current Mode:  ${CameraController.CONTROLS.RAIL_CONTROLS}
+    - ArrowUp: Go to the next step
+    - ArrowLeft / ArrowRight: Change the destination`;
   }
   if (event.key.toLocaleLowerCase() == 'o') {
     cameraController.switchControls(CameraController.CONTROLS.ORBIT_CONTROLS);
+    pBinds.innerText = `Current Mode:  ${CameraController.CONTROLS.ORBIT_CONTROLS}
+    - MouseDrag: Rotate around the target`;
   }
   if (event.key.toLocaleLowerCase() == 'f') {
     cameraController.switchControls(CameraController.CONTROLS.FLY_CONTROLS);
+    pBinds.innerText = `Current Mode:  ${CameraController.CONTROLS.FLY_CONTROLS}
+    - ArrowUp: Move forward
+    - ArrowDown: Move backward
+    - ArrowLeft: Move side to left
+    - ArrowRight: Move side to right
+    - MouseMove = Rotate camera
+    `;
   }
 });
 
