@@ -105,6 +105,7 @@ export class FlyControls {
 
   removeListeners() {
     this.domElement.removeEventListener('click', this.listeners['click']);
+    document.exitPointerLock();
     document.removeEventListener(
       'pointerlockchange',
       this.listeners['pointerlockchange']
