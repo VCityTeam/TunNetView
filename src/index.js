@@ -15,6 +15,8 @@ import { RailControls } from './RailControls';
 import { CameraController } from './CameraController';
 import { buildPoint, findStart } from './Point';
 import { isCameraUnderPlanar } from './utilsCamera';
+import { FlyControls } from './FlyControls.js';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
 // The PointCloudVisualizer widget stores the current camera position within
 // the local storage so that the rendering remains unchanged on scene reload.
@@ -282,24 +284,34 @@ const railControls = new RailControls(
   startPoint,
   mapPoint,
   app.itownsView,
-  offset
+  offset,
+  false
 );
-railControls.addListener();
-app.orbitControls.update();
+railControls.addListeners();
+
+const flyControls = new FlyControls(app.itownsView);
+flyControls.start();
 
 const mapControls = new Map();
 mapControls.set(CameraController.CONTROLS.ORBIT_CONTROLS, app.orbitControls);
 mapControls.set(CameraController.CONTROLS.RAIL_CONTROLS, railControls);
 
+mapControls.set(CameraController.CONTROLS.FLY_CONTROLS, flyControls);
+
 const cameraController = new CameraController(mapControls);
-cameraController.switchControls(CameraController.CONTROLS.ORBIT_CONTROLS);
+cameraController.disableControls();
+
+cameraController.switchControls(CameraController.CONTROLS.FLY_CONTROLS);
 
 window.addEventListener('keydown', (event) => {
-  if (event.key == 'ArrowUp') {
+  if (event.key == 'r') {
     cameraController.switchControls(CameraController.CONTROLS.RAIL_CONTROLS);
   }
   if (event.key.toLocaleLowerCase() == 'o') {
     cameraController.switchControls(CameraController.CONTROLS.ORBIT_CONTROLS);
+  }
+  if (event.key.toLocaleLowerCase() == 'f') {
+    cameraController.switchControls(CameraController.CONTROLS.FLY_CONTROLS);
   }
 });
 

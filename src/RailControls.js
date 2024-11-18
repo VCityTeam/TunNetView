@@ -178,7 +178,7 @@ export class RailControls {
   /**
    * Add keyboard event listeners for camera control.
    */
-  addListener() {
+  addListeners() {
     window.addEventListener(
       'keydown',
       (event) => {

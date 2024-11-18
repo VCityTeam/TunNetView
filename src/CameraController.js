@@ -1,7 +1,6 @@
 /**
  * @typedef Controls
  * @property {boolean} enabled - Set to false to disable this control.
- * @property {function(): void}  update - .
  */
 
 export class CameraController {
@@ -12,7 +11,7 @@ export class CameraController {
   constructor(mapControls) {
     this.mapControls = mapControls;
 
-    /**@type{Controls} */
+    /**@type {Controls} */
     this.currentControls = null;
 
     console.log(mapControls);
@@ -27,11 +26,18 @@ export class CameraController {
     this.disableControls();
     this.currentControls = this.mapControls.get(controlsMode);
     this.currentControls.enabled = true;
-    this.currentControls.update();
+
+    if (
+      controlsMode == CameraController.CONTROLS.ORBIT_CONTROLS ||
+      controlsMode == CameraController.CONTROLS.RAIL_CONTROLS
+    ) {
+      this.currentControls.update();
+    }
   }
 }
 
 CameraController.CONTROLS = {
   ORBIT_CONTROLS: 'orbit_control',
   RAIL_CONTROLS: 'rail_controls',
+  FLY_CONTROLS: 'fly_controls',
 };
