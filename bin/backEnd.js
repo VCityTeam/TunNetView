@@ -55,7 +55,7 @@ console.log('Displaying this cave URL', syntheticCaveUrl);
     '../public/assets/model/skeleton.obj'
   );
   console.log('Convert', pathFileSkeleton, 'to obj here', pathFileSkeletonObj);
-  await spawn('python', [
+  await spawn('python3', [
     path.resolve(__dirname, './convert_sdp_to_obj.py'),
     pathFileSkeleton,
     pathFileSkeletonObj,
