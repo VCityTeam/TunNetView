@@ -328,15 +328,6 @@ divCameraController.appendChild(pBinds);
 
 uiDomElement.appendChild(divCameraController);
 
-cameraController.switchControls(CameraController.CONTROLS.FLY_CONTROLS);
-pBinds.innerText = `Current Mode:  ${CameraController.CONTROLS.FLY_CONTROLS}
-- ArrowUp: Move forward
-- ArrowDown: Move backward
-- ArrowLeft: Move side to left
-- ArrowRight: Move side to right
-- MouseMove = Rotate camera
-`;
-
 window.addEventListener('keydown', (event) => {
   if (event.key == 'r') {
     cameraController.switchControls(CameraController.CONTROLS.RAIL_CONTROLS);
@@ -360,6 +351,9 @@ window.addEventListener('keydown', (event) => {
     `;
   }
 });
+
+// Select the default control
+window.dispatchEvent(new KeyboardEvent('keydown', {'key': 'o'}))
 
 const cameraProcess = new RequestAnimationFrameProcess(30);
 let cameraMatrixWorldPreviousFrame =

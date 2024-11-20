@@ -36,7 +36,7 @@ export class CameraController {
 }
 
 CameraController.CONTROLS = {
-  ORBIT_CONTROLS: 'orbit_control',
-  RAIL_CONTROLS: 'rail_controls',
-  FLY_CONTROLS: 'fly_controls',
+  ORBIT_CONTROLS: 'orbit',
+  RAIL_CONTROLS: 'rail',
+  FLY_CONTROLS: 'fly',
 };
