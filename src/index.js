@@ -302,11 +302,12 @@ cameraController.disableControls();
 
 const divCameraController = document.createElement('div');
 divCameraController.id = 'div_camera_controller';
+
 const labelChangeMode = document.createElement('label');
-
 labelChangeMode.innerText = 'Change Mode:';
-const listMode = document.createElement('ul');
+divCameraController.appendChild(labelChangeMode);
 
+const listMode = document.createElement('ul');
 const liModeOrbitsControls = document.createElement('li');
 liModeOrbitsControls.innerText =
   'o: ' + CameraController.CONTROLS.ORBIT_CONTROLS;
@@ -319,6 +320,8 @@ listMode.appendChild(liModeFlyControls);
 const liModeRailControls = document.createElement('li');
 liModeRailControls.innerText = 'r: ' + CameraController.CONTROLS.RAIL_CONTROLS;
 listMode.appendChild(liModeRailControls);
+
+divCameraController.appendChild(listMode);
 
 const pBinds = document.createElement('p');
 divCameraController.appendChild(pBinds);
