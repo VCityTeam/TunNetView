@@ -35,8 +35,8 @@ const syntheticCaveUrl =
 console.log('Displaying this cave URL', syntheticCaveUrl);
 
 (async () => {
-  const urlSkeleton = `${syntheticCaveUrl}/skeleton.sdp`;
-  const pathFileSkeleton = path.resolve(__dirname, '../skeleton.sdp');
+  const urlSkeleton = `${syntheticCaveUrl}/skeleton.obj`;
+  const pathFileSkeleton = path.resolve(__dirname, '../assets/model/skeleton.obj');
   console.log('Start fetching', urlSkeleton);
   const response = await fetch(urlSkeleton);
   console.log(`${urlSkeleton} fetched`);
@@ -46,24 +46,11 @@ console.log('Displaying this cave URL', syntheticCaveUrl);
     if (err) {
       console.error(err);
     } else {
-      console.log(`${pathFileSkeleton} is writed`);
+      console.log(`${pathFileSkeleton} is written.`);
     }
   });
 
-  const pathFileSkeletonObj = path.resolve(
-    __dirname,
-    '../public/assets/model/skeleton.obj'
-  );
-  console.log('Convert', pathFileSkeleton, 'to obj here', pathFileSkeletonObj);
-  await spawn('python3', [
-    path.resolve(__dirname, './convert_sdp_to_obj.py'),
-    pathFileSkeleton,
-    pathFileSkeletonObj,
-  ]);
-
-  console.log(`${pathFileSkeletonObj} is created`);
-
-  const mapPoint = await buildPoint(pathFileSkeletonObj);
+  const mapPoint = await buildPoint(pathFileSkeleton);
 
   // Create an object containing both mapPoint and startPoint
   const dataToWrite = {
