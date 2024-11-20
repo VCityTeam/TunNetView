@@ -36,10 +36,7 @@ console.log('Displaying this cave URL', syntheticCaveUrl);
 
 (async () => {
   const urlSkeleton = `${syntheticCaveUrl}/skeleton.obj`;
-  const pathFileSkeleton = path.resolve(
-    __dirname,
-    '../public/assets/model/skeleton.obj'
-  );
+  const pathFileSkeleton = path.resolve(__dirname, '../public/assets/model/skeleton.obj');
   console.log('Start fetching', urlSkeleton);
   const response = await fetch(urlSkeleton);
   console.log(`${urlSkeleton} fetched`);

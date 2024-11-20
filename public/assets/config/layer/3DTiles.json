@@ -2,7 +2,7 @@
   {
     "name": "Synthetic_caves",
 
-    "url": "https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_4_grid_size_x_1_grid_size_y_1_triangulation-3dtiles/tileset-translated-to-lyon-cathedral.json"
+    "url": "SYNTHETIC_CAVE_URL/tileset.json"
   },
   {
     "name": "Buildings",
