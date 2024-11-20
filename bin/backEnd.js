@@ -31,18 +31,30 @@ console.log(
  */
 const syntheticCaveUrl =
   process.env.SYNTHETIC_CAVE_URL ||
-  'http://graphiqueetimage.liris.cnrs.fr:8001/tilesets/';
+  'http://graphiqueetimage.liris.cnrs.fr:8001/tilesets';
 console.log('Displaying this cave URL', syntheticCaveUrl);
 
 (async () => {
   const urlSkeleton = `${syntheticCaveUrl}/skeleton.obj`;
-  const pathFileSkeleton = path.resolve(__dirname, '../assets/model/skeleton.obj');
+  const pathFileSkeleton = path.resolve(
+    __dirname,
+    '../public/assets/model/skeleton.obj'
+  );
   console.log('Start fetching', urlSkeleton);
   const response = await fetch(urlSkeleton);
   console.log(`${urlSkeleton} fetched`);
   const body = await response.text();
   console.log('Start writing file:', pathFileSkeleton);
-  fs.writeFile(pathFileSkeleton, body, (err) => {
+
+  await fs.promises.mkdir(
+    path.resolve(__dirname, '../public/assets/model'),
+    { recursive: true },
+    (err) => {
+      if (err) throw err;
+    }
+  );
+
+  fs.writeFileSync(pathFileSkeleton, body, (err) => {
     if (err) {
       console.error(err);
     } else {
