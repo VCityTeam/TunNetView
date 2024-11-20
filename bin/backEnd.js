@@ -38,7 +38,16 @@ console.log('Displaying this cave URL', syntheticCaveUrl);
   const urlSkeleton = `${syntheticCaveUrl}/skeleton.obj`;
   const pathFileSkeleton = path.resolve(__dirname, '../public/assets/model/skeleton.obj');
   console.log('Start fetching', urlSkeleton);
-  const response = await fetch(urlSkeleton);
+  let response=null;
+  try{
+    response = await fetch(urlSkeleton);
+    if(!response.ok){
+      throw new Error(response.status);
+    }
+  }
+  catch (error) {
+    console.log(`Error fetching: ${error.message}`)
+  }
   console.log(`${urlSkeleton} fetched`);
   const body = await response.text();
   console.log('Start writing file:', pathFileSkeleton);
