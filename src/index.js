@@ -16,7 +16,7 @@ import { CameraController } from './CameraController';
 import { buildPoint, findStart } from './Point';
 import { isCameraUnderPlanar } from './utilsCamera';
 import { FlyControls } from './FlyControls.js';
-import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
 // The PointCloudVisualizer widget stores the current camera position within
 // the local storage so that the rendering remains unchanged on scene reload.
@@ -170,6 +170,40 @@ const initLayerPromise = new Promise((resolve) => {
   });
 });
 
+const c3dTLSyntheticCaves = app.itownsView
+  .getLayers()
+  .filter((el) => el.isC3DTilesLayer && el.id == 'Synthetic_caves');
+
+c3dTLSyntheticCaves.forEach((layer) => {
+  // layer.opacity = 0.5;
+
+  layer.addEventListener(
+    itowns.C3DTILES_LAYER_EVENTS.ON_TILE_CONTENT_LOADED,
+    ({ tileContent }) => {
+      console.log(tileContent);
+      tileContent.traverse((child) => {
+        if (child.geometry) {
+          console.log('GEO', child);
+          console.log(
+            'BEFORE MERGE !',
+            child.geometry.attributes.position.array
+          );
+          child.geometry = BufferGeometryUtils.mergeVertices(child.geometry);
+          console.log(
+            'AFTER MERGE ! points',
+            child.geometry.attributes.position.array
+          );
+          console.log('AFTER MERGE ! indexes', child.geometry.index.array);
+          child.material.flatShading = false;
+          child.geometry.computeVertexNormals();
+        } else {
+          // console.log('NOGEO', child);
+        }
+      });
+    }
+  );
+});
+
 await loadingScreen(['TUNNETVIEW'], initLayerPromise);
 
 /////////////////////////////////////////////////////////////////////////
@@ -219,15 +253,15 @@ const planarLayer = app.itownsView
   .getLayers()
   .filter((el) => el.id == 'planar')[0];
 
-const c3dTLBuildings = app.itownsView
-  .getLayers()
-  .filter((el) => el.isC3DTilesLayer && el.id == 'Buildings');
-
 planarLayer.object3d.traverse((child) => {
   if (child.material) {
     child.material.side = THREE.DoubleSide;
   }
 });
+
+const c3dTLBuildings = app.itownsView
+  .getLayers()
+  .filter((el) => el.isC3DTilesLayer && el.id == 'Buildings');
 
 /*USE   app.itownsView.addEventListener(itowns.MAIN_LOOP_EVENTS.AFTER_CAMERA_UPDATE,()=>{}); if you enable itowns controls*/
 app.itownsView.camera3D.addEventListener('change', () => {
@@ -353,7 +387,7 @@ window.addEventListener('keydown', (event) => {
 });
 
 // Select the default control
-window.dispatchEvent(new KeyboardEvent('keydown', {'key': 'o'}))
+window.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' }));
 
 const cameraProcess = new RequestAnimationFrameProcess(30);
 let cameraMatrixWorldPreviousFrame =
