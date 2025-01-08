@@ -39,13 +39,16 @@ open http://localhost:8000
 The following environment variables are recognized
 
 - `PORT` in order to configure the port listened by the http server,
-- `SYNTHETIC_CAVE_URL` in order to designate the `URL` of the cave point cloud
+- `SYNTHETIC_CAVE_URL` in order to designate the `URL` of directory holding the cave data, that should hold three files
+    - `tileset.json`: the 3DTiles tileset description (and its dependencies i.e. the `tiles/` subdirectory...)
+    - `skeleton.sdp`: the extracted graph structure on which "walking" in the cave is done.
+    - `geo_offset.txt`: the geographical position describing where the cave should be implanted.
 
-Usage example
+FIXME, FIXME, FIXME: the following example will fail because the SYNTHETIC_CAVE_URL does not hold the expected skeleton and geo_offset.txt files
 
 ```bash
 export PORT=8099
-export SYNTHETIC_CAVE_URL=https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_1_grid_size_x_1_grid_size_y_1_point_cloud-3dtiles/tileset-translated-to-lyon-cathedral.json
+export SYNTHETIC_CAVE_URL=https://dataset-dl.liris.cnrs.fr/synthetic-cave-and-tunnel-systems/Cave/cave_sub_1_grid_size_x_1_grid_size_y_1_point_cloud-3dtiles/
 npm run start &
 open http://localhost:$PORT
 ```
